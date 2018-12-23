@@ -38,6 +38,6 @@ all:
 # $ make list_targets
 # List all possible targets
 list_targets:
-	@	echo "all"
-	@	echo "list_targets"
+	@	echo "all";
+	@	echo "list_targets";
 
