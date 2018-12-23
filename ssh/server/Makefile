@@ -27,12 +27,12 @@ all:
 			fi;                                                                                          \
 			cp $$PATH_SSHD_CONFIG /etc/ssh/sshd_config;                                                  \
 			sudo systemctl restart sshd.service;                                                         \
+			exit;                                                                                        \
+		fi;                                                                                              \
+		if [ -z "$$OS_ID" ]; then                                                                        \
+			echo "Error: OS not supported";                                                              \
 		else                                                                                             \
-			if [ -z "$$OS_ID" ]; then                                                                    \
-				echo "Error: OS not supported";                                                          \
-			else                                                                                         \
-				echo "Error: $$OS_ID OS not supported";                                                  \
-			fi;                                                                                          \
+			echo "Error: $$OS_ID OS not supported";                                                      \
 		fi;
 
 # $ make list_targets
