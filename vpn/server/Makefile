@@ -82,6 +82,10 @@ client:
 			echo "Error: Please run as root";                                           \
 			exit;                                                                       \
 		fi;                                                                             \
+		if [ -z $(CLIENT) ]; then                                                       \
+			echo "Error: CLIENT arg is not set";                                        \
+			exit;                                                                       \
+		fi;                                                                             \
 		PATH_PWD=$$(pwd);                                                               \
 		cd /etc/openvpn/easy-rsa/ || (echo "Error: Please run make all first" && exit); \
 		if [ -z "$$(ls | grep vars)" ]; then                                            \
