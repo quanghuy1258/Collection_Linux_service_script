@@ -39,11 +39,11 @@ all:
 		fi;                                                                                               \
 		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                          \
 		if [ "$$OS_ID" = "ubuntu" ]; then                                                                 \
-			if [ -z "$$(apt list --installed | grep openvpn)" ]; then                                     \
+			if [ -z "$$(apt list --installed | grep "^openvpn/")" ]; then                                 \
 				echo "Installing openvpn ...";                                                            \
 				sudo apt-get -y install openvpn;                                                          \
 			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep easy-rsa)" ]; then                                    \
+			if [ -z "$$(apt list --installed | grep "^easy-rsa/")" ]; then                                \
 				echo "Installing easy-rsa ...";                                                           \
 				sudo apt-get -y install easy-rsa;                                                         \
 			fi;                                                                                           \
@@ -68,6 +68,7 @@ all:
 				sudo systemctl restart openvpn@server;                                                    \
 			fi;                                                                                           \
 			cd $$PATH_PWD;                                                                                \
+			exit;                                                                                         \
 		fi;                                                                                               \
 		if [ -z "$$OS_ID" ]; then                                                                         \
 			echo "Error: OS not supported";                                                               \

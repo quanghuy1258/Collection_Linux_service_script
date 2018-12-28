@@ -26,11 +26,11 @@ all:
 		fi;                                                                                               \
 		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                          \
 		if [ "$$OS_ID" = "ubuntu" ]; then                                                                 \
-			if [ -z "$$(apt list --installed | grep openssh-client)" ]; then                              \
+			if [ -z "$$(apt list --installed | grep "^openssh-client/")" ]; then                          \
 				echo "Installing openssh-client ...";                                                     \
 				sudo apt-get -y install openssh-client;                                                   \
 			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep openssh-server)" ]; then                              \
+			if [ -z "$$(apt list --installed | grep "^openssh-server/")" ]; then                          \
 				echo "Installing openssh-server ...";                                                     \
 				sudo apt-get -y install openssh-server;                                                   \
 			fi;                                                                                           \

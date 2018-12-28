@@ -53,7 +53,7 @@ all:
 		fi;                                                                                               \
 		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                          \
 		if [ "$$OS_ID" = "ubuntu" ]; then                                                                 \
-			if [ -z "$$(apt list --installed | grep openvpn)" ]; then                                     \
+			if [ -z "$$(apt list --installed | grep "^openvpn/")" ]; then                                 \
 				echo "Installing openvpn ...";                                                            \
 				sudo apt-get -y install openvpn;                                                          \
 			fi;                                                                                           \
@@ -68,6 +68,7 @@ all:
 			else                                                                                          \
 				sudo systemctl restart openvpn@client;                                                    \
 			fi;                                                                                           \
+			exit;                                                                                         \
 		fi;                                                                                               \
 		if [ -z "$$OS_ID" ]; then                                                                         \
 			echo "Error: OS not supported";                                                               \
