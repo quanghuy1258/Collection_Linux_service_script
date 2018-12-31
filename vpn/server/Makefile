@@ -21,11 +21,8 @@ all:
 			exit;                                                                                         \
 		fi;                                                                                               \
 		if [ ! -z "$$(shasum $$PATH_VARS | grep 2f97e05577b3b2a4f6e163a3fd503ec94d6e3ef1)" ]; then        \
-			echo "Warning: Please modify vars file";                                                      \
-			read -r -p "Continue? [y/N] " response;                                                       \
-			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                         \
-				exit;                                                                                     \
-			fi;                                                                                           \
+			echo "Error: Please modify vars file";                                                        \
+			exit;                                                                                         \
 		fi;                                                                                               \
 		PATH_SERVER_CONF=$$(pwd)/server.conf;                                                             \
 		if [ ! -f $$PATH_SERVER_CONF ]; then                                                              \
@@ -55,11 +52,11 @@ all:
 			sudo cp $$PATH_SERVER_CONF /etc/openvpn/;                                                     \
 			PATH_PWD=$$(pwd);                                                                             \
 			cd /etc/openvpn/easy-rsa/;                                                                    \
-			source vars;                                                                                  \
-			sudo ./clean-all;                                                                             \
-			sudo ./build-ca;                                                                              \
-			sudo ./build-key-server server;                                                               \
-			sudo ./build-dh;                                                                              \
+			source ./vars &&                                                                              \
+				sudo ./clean-all &&                                                                       \
+				sudo ./build-ca &&                                                                        \
+				sudo ./build-key-server server &&                                                         \
+				sudo ./build-dh;                                                                          \
 			cd keys/;                                                                                     \
 			sudo cp server.crt server.key ca.crt dh2048.pem /etc/openvpn/;                                \
 			cd /etc/openvpn;                                                                              \
