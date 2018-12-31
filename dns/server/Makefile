@@ -1,5 +1,7 @@
 # Using Makefile instead of bash script
 
+SHELL := /bin/bash
+
 # $ make list_targets
 # List all possible targets
 list_targets:
