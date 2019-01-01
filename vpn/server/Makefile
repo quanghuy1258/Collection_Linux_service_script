@@ -1,5 +1,6 @@
 SHELL    := /bin/bash
 PATH_PWD := $(shell pwd)
+OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
 help:
 	@	echo "- Show help:                             $$ make help"
@@ -16,8 +17,7 @@ install:
 			echo "Error: Please run as root";                              \
 			exit;                                                          \
 		fi;                                                                \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);           \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                  \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                 \
 			if [ -z "$$(apt list --installed | grep "^openvpn/")" ]; then  \
 				echo "===== Install openvpn =====";                        \
 				apt-get -y install openvpn;                                \
@@ -29,10 +29,10 @@ install:
 			echo "===== Done =====";                                       \
 			exit;                                                          \
 		fi;                                                                \
-		if [ -z "$$OS_ID" ]; then                                          \
+		if [ -z "$(OS_ID)" ]; then                                         \
 			echo "Error: OS not supported";                                \
 		else                                                               \
-			echo "Error: $$OS_ID OS not supported";                        \
+			echo "Error: $(OS_ID) OS not supported";                       \
 		fi;
 
 uninstall:
@@ -40,8 +40,7 @@ uninstall:
 			echo "Error: Please run as root";                                                \
 			exit;                                                                            \
 		fi;                                                                                  \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                             \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                   \
 			if [ ! -z "$$(systemctl status openvpn@server | grep "Active: active ")" ]; then \
 				systemctl stop openvpn@server;                                               \
 			fi;                                                                              \
@@ -57,10 +56,10 @@ uninstall:
 			echo "===== Done =====";                                                         \
 			exit;                                                                            \
 		fi;                                                                                  \
-		if [ -z "$$OS_ID" ]; then                                                            \
+		if [ -z "$(OS_ID)" ]; then                                                           \
 			echo "Error: OS not supported";                                                  \
 		else                                                                                 \
-			echo "Error: $$OS_ID OS not supported";                                          \
+			echo "Error: $(OS_ID) OS not supported";                                         \
 		fi;
 
 init:
@@ -75,8 +74,7 @@ init:
 				exit;                                                                                   \
 			fi;                                                                                         \
 		fi;                                                                                             \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                        \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                                               \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
 			mkdir -p /etc/openvpn/easy-rsa/keys;                                                        \
 			cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa/;                                         \
 			cp $(PATH_PWD)/vars /etc/openvpn/easy-rsa/;                                                 \
@@ -96,33 +94,32 @@ init:
 			echo "===== Done =====";                                                                    \
 			exit;                                                                                       \
 		fi;                                                                                             \
-		if [ -z "$$OS_ID" ]; then                                                                       \
+		if [ -z "$(OS_ID)" ]; then                                                                      \
 			echo "Error: OS not supported";                                                             \
 		else                                                                                            \
-			echo "Error: $$OS_ID OS not supported";                                                     \
+			echo "Error: $(OS_ID) OS not supported";                                                    \
 		fi;
 
 server:
-	@	if [ $$(id -u) -ne 0 ]; then                             \
-			echo "Error: Please run as root";                    \
-			exit;                                                \
-		fi;                                                      \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-); \
-		if [ "$$OS_ID" = "ubuntu" ]; then                        \
-			cd /etc/openvpn/easy-rsa/;                           \
-			source ./vars;                                       \
-			echo "===== Build server key: server =====";         \
-			./build-key-server server;                           \
-			cd keys/;                                            \
-			cp server.crt server.key /etc/openvpn/;              \
-			cd $(PATH_PWD);                                      \
-			echo "===== Done =====";                             \
-			exit;                                                \
-		fi;                                                      \
-		if [ -z "$$OS_ID" ]; then                                \
-			echo "Error: OS not supported";                      \
-		else                                                     \
-			echo "Error: $$OS_ID OS not supported";              \
+	@	if [ $$(id -u) -ne 0 ]; then                     \
+			echo "Error: Please run as root";            \
+			exit;                                        \
+		fi;                                              \
+		if [ "$(OS_ID)" = "ubuntu" ]; then               \
+			cd /etc/openvpn/easy-rsa/;                   \
+			source ./vars;                               \
+			echo "===== Build server key: server ====="; \
+			./build-key-server server;                   \
+			cd keys/;                                    \
+			cp server.crt server.key /etc/openvpn/;      \
+			cd $(PATH_PWD);                              \
+			echo "===== Done =====";                     \
+			exit;                                        \
+		fi;                                              \
+		if [ -z "$(OS_ID)" ]; then                       \
+			echo "Error: OS not supported";              \
+		else                                             \
+			echo "Error: $(OS_ID) OS not supported";     \
 		fi;
 
 start:
@@ -137,8 +134,7 @@ start:
 				exit;                                                                                          \
 			fi;                                                                                                \
 		fi;                                                                                                    \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                               \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                     \
 			cp $(PATH_PWD)/server.conf /etc/openvpn/;                                                          \
 			if [ -z "$$(systemctl status openvpn@server | grep "Active: active ")" ]; then                     \
 				echo "===== Start openvpn@server =====";                                                       \
@@ -150,10 +146,10 @@ start:
 			echo "===== Done =====";                                                                           \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ -z "$$OS_ID" ]; then                                                                              \
+		if [ -z "$(OS_ID)" ]; then                                                                             \
 			echo "Error: OS not supported";                                                                    \
 		else                                                                                                   \
-			echo "Error: $$OS_ID OS not supported";                                                            \
+			echo "Error: $(OS_ID) OS not supported";                                                           \
 		fi;
 
 client:
@@ -165,8 +161,7 @@ client:
 			echo "Error: CLIENT arg is not set";                     \
 			exit;                                                    \
 		fi;                                                          \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);     \
-		if [ "$$OS_ID" = "ubuntu" ]; then                            \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                           \
 			cd /etc/openvpn/easy-rsa/;                               \
 			source vars;                                             \
 			./build-key $(CLIENT);                                   \
@@ -179,9 +174,9 @@ client:
 			echo "===== Done =====";                                 \
 			exit;                                                    \
 		fi;                                                          \
-		if [ -z "$$OS_ID" ]; then                                    \
+		if [ -z "$(OS_ID)" ]; then                                   \
 			echo "Error: OS not supported";                          \
 		else                                                         \
-			echo "Error: $$OS_ID OS not supported";                  \
+			echo "Error: $(OS_ID) OS not supported";                 \
 		fi;
 
