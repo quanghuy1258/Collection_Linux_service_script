@@ -17,11 +17,11 @@ install:
 		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                 \
 		if [ "$$OS_ID" = "ubuntu" ]; then                                        \
 			if [ -z "$$(apt list --installed | grep "^openssh-client/")" ]; then \
-				echo "Installing openssh-client ...";                            \
+				echo "===== Install openssh-client =====";                       \
 				apt-get -y install openssh-client;                               \
 			fi;                                                                  \
 			if [ -z "$$(apt list --installed | grep "^openssh-server/")" ]; then \
-				echo "Installing openssh-server ...";                            \
+				echo "===== Install openssh-server =====";                       \
 				apt-get -y install openssh-server;                               \
 			fi;                                                                  \
 			echo "===== Done =====";                                             \
@@ -41,7 +41,7 @@ uninstall:
 		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                   \
 		if [ "$$OS_ID" = "ubuntu" ]; then                                          \
 			if [ ! -z "$$(apt list --installed | grep "^openssh-server/")" ]; then \
-				echo "Installing openssh-server ...";                              \
+				echo "===== Uninstall openssh-server =====";                       \
 				apt-get -y purge openssh-server;                                   \
 			fi;                                                                    \
 			echo "===== Done =====";                                               \
