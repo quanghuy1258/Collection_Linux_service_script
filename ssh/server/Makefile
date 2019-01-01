@@ -78,22 +78,22 @@ configure:
 		fi;
 
 start:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                 \
-			echo "Error: Please run as root";                                                        \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                     \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                                            \
-			if [ -z "$$(systemctl status sshd.service | grep -E "Active: active (running)")" ]; then \
-				sudo systemctl start sshd.service;                                                   \
-			else                                                                                     \
-				sudo systemctl restart sshd.service;                                                 \
-			fi;                                                                                      \
-			echo "===== Done =====";                                                                 \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ -z "$$OS_ID" ]; then                                                                    \
-			echo "Error: OS not supported";                                                          \
-		else                                                                                         \
-			echo "Error: $$OS_ID OS not supported";                                                  \
+	@	if [ $$(id -u) -ne 0 ]; then                                                     \
+			echo "Error: Please run as root";                                            \
+			exit;                                                                        \
+		fi;                                                                              \
+		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                         \
+		if [ "$$OS_ID" = "ubuntu" ]; then                                                \
+			if [ -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
+				sudo systemctl start sshd.service;                                       \
+			else                                                                         \
+				sudo systemctl restart sshd.service;                                     \
+			fi;                                                                          \
+			echo "===== Done =====";                                                     \
+			exit;                                                                        \
+		fi;                                                                              \
+		if [ -z "$$OS_ID" ]; then                                                        \
+			echo "Error: OS not supported";                                              \
+		else                                                                             \
+			echo "Error: $$OS_ID OS not supported";                                      \
 		fi;
