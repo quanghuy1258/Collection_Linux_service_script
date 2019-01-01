@@ -40,6 +40,7 @@ uninstall:
 		fi;                                                                                \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                 \
 			if [ ! -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
+				echo "===== Stop sshd.service =====";                                      \
 				systemctl stop sshd.service;                                               \
 			fi;                                                                            \
 			if [ ! -z "$$(apt list --installed | grep "^openssh-server/")" ]; then         \
@@ -85,8 +86,10 @@ start:
 		fi;                                                                              \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                               \
 			if [ -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
+				echo "===== Start sshd.service =====";                                   \
 				sudo systemctl start sshd.service;                                       \
 			else                                                                         \
+				echo "===== Restart sshd.service =====";                                 \
 				sudo systemctl restart sshd.service;                                     \
 			fi;                                                                          \
 			echo "===== Done =====";                                                     \

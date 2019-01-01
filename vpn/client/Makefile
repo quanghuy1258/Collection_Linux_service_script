@@ -8,6 +8,7 @@ help:
 	@	echo "- Uninstall dependencies:     $$ sudo make uninstall"
 	@	echo "- Configure:              (2) $$ sudo make configure CLIENT={string}"
 	@	echo "- Start:                  (3) $$ sudo make start"
+	@	echo "- Stop:                       $$ sudo make stop"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
 install:
@@ -36,6 +37,7 @@ uninstall:
 		fi;                                                                                  \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                   \
 			if [ ! -z "$$(systemctl status openvpn@client | grep "Active: active ")" ]; then \
+				echo "===== Stop openvpn@client =====";                                      \
 				systemctl stop openvpn@client;                                               \
 			fi;                                                                              \
 			if [ ! -z "$$(apt list --installed | grep "^openvpn/")" ]; then                  \
@@ -116,8 +118,10 @@ start:
 		fi;                                                                                \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                 \
 			if [ -z "$$(systemctl status openvpn@client | grep "Active: active ")" ]; then \
+				echo "===== Start openvpn@client =====";                                   \
 				sudo systemctl start openvpn@client;                                       \
 			else                                                                           \
+				echo "===== Restart openvpn@client =====";                                 \
 				sudo systemctl restart openvpn@client;                                     \
 			fi;                                                                            \
 			echo "===== Done =====";                                                       \
@@ -129,3 +133,21 @@ start:
 			echo "Error: $(OS_ID) OS not supported";                                       \
 		fi;
 
+stop:
+	@	if [ $$(id -u) -ne 0 ]; then                                                         \
+			echo "Error: Please run as root";                                                \
+			exit;                                                                            \
+		fi;                                                                                  \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                   \
+			if [ ! -z "$$(systemctl status openvpn@client | grep "Active: active ")" ]; then \
+				echo "===== Stop openvpn@client =====";                                      \
+				sudo systemctl stop openvpn@client;                                          \
+			fi;                                                                              \
+			echo "===== Done =====";                                                         \
+			exit;                                                                            \
+		fi;                                                                                  \
+		if [ -z "$(OS_ID)" ]; then                                                           \
+			echo "Error: OS not supported";                                                  \
+		else                                                                                 \
+			echo "Error: $(OS_ID) OS not supported";                                         \
+		fi;

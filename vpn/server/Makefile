@@ -42,6 +42,7 @@ uninstall:
 		fi;                                                                                  \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                   \
 			if [ ! -z "$$(systemctl status openvpn@server | grep "Active: active ")" ]; then \
+				echo "===== Stop openvpn@server =====";                                      \
 				systemctl stop openvpn@server;                                               \
 			fi;                                                                              \
 			rm -rf /etc/openvpn/easy-rsa/;                                                   \
