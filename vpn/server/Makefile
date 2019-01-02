@@ -7,9 +7,9 @@ help:
 	@	echo "- Install dependencies:              (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:                $$ sudo make uninstall"
 	@	echo "- Init configure:                    (2) $$ sudo make init"
-	@	echo "- Build server key:                  (3) $$ sudo make server"
+	@	echo "- Create server cert & key:          (3) $$ sudo make server"
 	@	echo "- Add server config & start service: (4) $$ sudo make start"
-	@	echo "- Create client cert:                    $$ sudo make client CLIENT={string}"
+	@	echo "- Create client cert & key:              $$ sudo make client CLIENT={string}"
 	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4)"
 
 install:
