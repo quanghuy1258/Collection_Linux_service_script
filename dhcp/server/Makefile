@@ -62,7 +62,7 @@ configure:
 			exit;                                                                                             \
 		fi;                                                                                                   \
 		if [ ! -z "$$(shasum $(PATH_PWD)/dhcpd.conf | grep d054cee68719a876ca97c73fe8878ac4bb30bed0)" ]; then \
-			echo "Error: Please modify sshd_config file";                                                     \
+			echo "Error: Please modify dhcpd.conf file";                                                      \
 			exit;                                                                                             \
 		fi;                                                                                                   \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                    \
