@@ -80,7 +80,7 @@ init:
 			cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa/;                                         \
 			cp $(PATH_PWD)/vars /etc/openvpn/easy-rsa/;                                                 \
 			cd /etc/openvpn/easy-rsa/;                                                                  \
-			ln -s openssl-1.0.0.cnf openssl.cnf                                                         \
+			ln -s openssl-1.0.0.cnf openssl.cnf;                                                        \
 			source ./vars;                                                                              \
 			./clean-all;                                                                                \
 			echo "===== Init CA =====";                                                                 \
