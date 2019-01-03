@@ -78,6 +78,7 @@ init:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
 			mkdir -p /etc/openvpn/easy-rsa/keys;                                                        \
 			cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa/;                                         \
+			cp /etc/ssl/openssl.cnf /etc/openvpn/easy-rsa/;                                             \
 			cp $(PATH_PWD)/vars /etc/openvpn/easy-rsa/;                                                 \
 			cd /etc/openvpn/easy-rsa/;                                                                  \
 			source ./vars;                                                                              \
