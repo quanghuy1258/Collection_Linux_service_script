@@ -8,9 +8,10 @@ help:
 	@	echo "- Uninstall dependencies:                $$ sudo make uninstall"
 	@	echo "- Init configure:                    (2) $$ sudo make init"
 	@	echo "- Create server cert & key:          (3) $$ sudo make server"
-	@	echo "- Add server config & start service: (4) $$ sudo make start"
+	@	echo "- Configure routing & firewall:      (4) $$ sudo make routing_firewall"
+	@	echo "- Add server config & start service: (5) $$ sudo make start"
 	@	echo "- Create client cert & key:              $$ sudo make client CLIENT={string}"
-	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4)"
+	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5)"
 
 install:
 	@	if [ $$(id -u) -ne 0 ]; then                                       \
@@ -122,6 +123,42 @@ server:
 			echo "Error: OS not supported";              \
 		else                                             \
 			echo "Error: $(OS_ID) OS not supported";     \
+		fi;
+
+routing_firewall:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                           \
+			echo "Error: Please run as root";                                                                  \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ ! -f $(PATH_PWD)/routing.sh ]; then                                                               \
+			echo "Error: File routing.sh not found";                                                           \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ ! -z "$$(shasum $(PATH_PWD)/routing.sh | grep 57f7ce2160ee53741f70a06b8711fc4ad5b2608c)" ]; then  \
+			echo "Warning: Please modify routing.sh file";                                                     \
+			read -r -p "Continue? [y/N] " response;                                                            \
+			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                              \
+				exit;                                                                                          \
+			fi;                                                                                                \
+		fi;                                                                                                    \
+		if [ ! -f $(PATH_PWD)/firewall.sh ]; then                                                              \
+			echo "Error: File firewall.sh not found";                                                          \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ ! -z "$$(shasum $(PATH_PWD)/firewall.sh | grep 8341255f50abaa96ad4bbd1d850f860c95388298)" ]; then \
+			echo "Error: Please modify firewall.sh file";                                                      \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                     \
+			$(PATH_PWD)/routing.sh;                                                                            \
+			$(PATH_PWD)/firewall.sh;                                                                           \
+			echo "===== Done =====";                                                                           \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ -z "$(OS_ID)" ]; then                                                                             \
+			echo "Error: OS not supported";                                                                    \
+		else                                                                                                   \
+			echo "Error: $(OS_ID) OS not supported";                                                           \
 		fi;
 
 start:
