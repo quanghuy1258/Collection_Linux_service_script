@@ -105,8 +105,8 @@ iface_ip:
 			if [ ! -f /etc/default/isc-dhcp-server.bak ]; then                                                                                                                             \
 				cp /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.bak;                                                                                                          \
 			fi;                                                                                                                                                                            \
-			ip address flush dev $(IFACE);                                                                                                                                                 \
-			ip address add $(IP) dev $(IFACE);                                                                                                                                             \
+			ip addr flush dev $(IFACE);                                                                                                                                                    \
+			ip addr add $(IP) dev $(IFACE);                                                                                                                                                \
 			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"(|.* )$(IFACE)(| .*)\"$$")" ]; then                                                               \
 				echo "Info: Already add $(IFACE)";                                                                                                                                         \
 				exit;                                                                                                                                                                      \
