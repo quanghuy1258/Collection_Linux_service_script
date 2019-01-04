@@ -3,12 +3,12 @@ PATH_PWD := $(shell pwd)
 OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
 help:
-	@	echo "- Show help:                  $$ make help"
-	@	echo "- Install dependencies:   (1) $$ sudo make install"
-	@	echo "- Uninstall dependencies:     $$ sudo make uninstall"
-	@	echo "- Configure:              (2) $$ sudo make configure"
-	@	echo "- Add network interface:      $$ sudo make interface IFACE={string}"
-	@	echo "- Start service:          (3) $$ sudo make start"
+	@	echo "- Show help:                                       $$ make help"
+	@	echo "- Install dependencies:                        (1) $$ sudo make install"
+	@	echo "- Uninstall dependencies:                          $$ sudo make uninstall"
+	@	echo "- Configure:                                   (2) $$ sudo make configure"
+	@	echo "- Add network interface and assign IP address: (3) $$ sudo make iface_ip IFACE={string} IP={string}"
+	@	echo "- Start service:                               (4) $$ sudo make start"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
 install:
@@ -80,38 +80,48 @@ configure:
 			echo "Error: $(OS_ID) OS not supported";                                                          \
 		fi;
 
-interface:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                                         \
-			echo "Error: Please run as root";                                                                                \
-			exit;                                                                                                            \
-		fi;                                                                                                                  \
-		if [ -z $(IFACE) ]; then                                                                                             \
-			echo "Error: IFACE arg is not set";                                                                              \
-			exit;                                                                                                            \
-		fi;                                                                                                                  \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                   \
-			if [ ! -f /etc/default/isc-dhcp-server ]; then                                                                   \
-				echo "Error: File /etc/default/isc-dhcp-server not found";                                                   \
-				exit;                                                                                                        \
-			fi;                                                                                                              \
-			if [ ! -f /etc/default/isc-dhcp-server.bak ]; then                                                               \
-				cp /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.bak;                                            \
-			fi;                                                                                                              \
-			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"(|.* )$(IFACE)(| .*)\"$$")" ]; then \
-				echo "Info: Already add $(IFACE)";                                                                           \
-				exit;                                                                                                        \
-			fi;                                                                                                              \
-			CUR_IFACES=$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\".*\"$$");                           \
-			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"\"$$")" ]; then                     \
-				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"\"/\"$(IFACE)\"/");                                        \
-			else                                                                                                             \
-				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"$$/ $(IFACE)\"/");                                         \
-			fi;                                                                                                              \
-			echo "Info: Replace $$CUR_IFACES by $$NEW_IFACES";                                                               \
-			sed -re "s/$$CUR_IFACES/$$NEW_IFACES/" -i /etc/default/isc-dhcp-server;                                          \
-			echo "===== Done =====";                                                                                         \
-			exit;                                                                                                            \
-		fi;                                                                                                                  \
+iface_ip:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                                                                                       \
+			echo "Error: Please run as root";                                                                                                                                              \
+			exit;                                                                                                                                                                          \
+		fi;                                                                                                                                                                                \
+		if [ -z $(IFACE) ]; then                                                                                                                                                           \
+			echo "Error: IFACE arg is not set";                                                                                                                                            \
+			exit;                                                                                                                                                                          \
+		fi;                                                                                                                                                                                \
+		if [ -z $(IP) ]; then                                                                                                                                                              \
+			echo "Error: IP arg is not set";                                                                                                                                               \
+			exit;                                                                                                                                                                          \
+		fi;                                                                                                                                                                                \
+		if [ -z "$$(echo $(IP) | grep -E "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([0-9]|[1-2][0-9]|3[0-1])$$")" ]; then \
+			echo "Error: $(IP) wrong format -> x.x.x.x/x";                                                                                                                                 \
+			exit;                                                                                                                                                                          \
+		fi;                                                                                                                                                                                \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                                                                                 \
+			if [ ! -f /etc/default/isc-dhcp-server ]; then                                                                                                                                 \
+				echo "Error: File /etc/default/isc-dhcp-server not found";                                                                                                                 \
+				exit;                                                                                                                                                                      \
+			fi;                                                                                                                                                                            \
+			if [ ! -f /etc/default/isc-dhcp-server.bak ]; then                                                                                                                             \
+				cp /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.bak;                                                                                                          \
+			fi;                                                                                                                                                                            \
+			ip address flush dev $(IFACE);                                                                                                                                                 \
+			ip address add $(IP) dev $(IFACE);                                                                                                                                             \
+			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"(|.* )$(IFACE)(| .*)\"$$")" ]; then                                                               \
+				echo "Info: Already add $(IFACE)";                                                                                                                                         \
+				exit;                                                                                                                                                                      \
+			fi;                                                                                                                                                                            \
+			CUR_IFACES=$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\".*\"$$");                                                                                         \
+			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"\"$$")" ]; then                                                                                   \
+				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"\"/\"$(IFACE)\"/");                                                                                                      \
+			else                                                                                                                                                                           \
+				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"$$/ $(IFACE)\"/");                                                                                                       \
+			fi;                                                                                                                                                                            \
+			echo "Info: Replace $$CUR_IFACES by $$NEW_IFACES";                                                                                                                             \
+			sed -re "s/$$CUR_IFACES/$$NEW_IFACES/" -i /etc/default/isc-dhcp-server;                                                                                                        \
+			echo "===== Done =====";                                                                                                                                                       \
+			exit;                                                                                                                                                                          \
+		fi;                                                                                                                                                                                \
 		if [ -z "$(OS_ID)" ]; then                                                                                           \
 			echo "Error: OS not supported";                                                                                  \
 		else                                                                                                                 \
