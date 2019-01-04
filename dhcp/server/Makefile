@@ -7,6 +7,7 @@ help:
 	@	echo "- Install dependencies:   (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:     $$ sudo make uninstall"
 	@	echo "- Configure:              (2) $$ sudo make configure"
+	@	echo "- Add network interface:      $$ sudo make interface IFACE={string}"
 	@	echo "- Start service:          (3) $$ sudo make start"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
@@ -77,6 +78,44 @@ configure:
 			echo "Error: OS not supported";                                                                   \
 		else                                                                                                  \
 			echo "Error: $(OS_ID) OS not supported";                                                          \
+		fi;
+
+interface:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                         \
+			echo "Error: Please run as root";                                                                                \
+			exit;                                                                                                            \
+		fi;                                                                                                                  \
+		if [ -z $(IFACE) ]; then                                                                                             \
+			echo "Error: IFACE arg is not set";                                                                              \
+			exit;                                                                                                            \
+		fi;                                                                                                                  \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                   \
+			if [ ! -f /etc/default/isc-dhcp-server ]; then                                                                   \
+				echo "Error: File /etc/default/isc-dhcp-server not found";                                                   \
+				exit;                                                                                                        \
+			fi;                                                                                                              \
+			if [ ! -f /etc/default/isc-dhcp-server.bak ]; then                                                               \
+				cp /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.bak;                                            \
+			fi;                                                                                                              \
+			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"(|.* )$(IFACE)(| .*)\"$$")" ]; then \
+				echo "Info: Already add $(IFACE)";                                                                           \
+				exit;                                                                                                        \
+			fi;                                                                                                              \
+			CUR_IFACES=$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\".*\"$$");                           \
+			if [ ! -z "$$(cat /etc/default/isc-dhcp-server | grep -E "^INTERFACES(|v4)=\"\"$$")" ]; then                     \
+				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"\"/\"$(IFACE)\"/");                                        \
+			else                                                                                                             \
+				NEW_IFACES=$$(echo -n $$CUR_IFACES | sed -re "s/\"$$/ $(IFACE)\"/");                                         \
+			fi;                                                                                                              \
+			echo "Info: Replace $$CUR_IFACES by $$NEW_IFACES";                                                               \
+			sed -re "s/$$CUR_IFACES/$$NEW_IFACES/" -i /etc/default/isc-dhcp-server;                                          \
+			echo "===== Done =====";                                                                                         \
+			exit;                                                                                                            \
+		fi;                                                                                                                  \
+		if [ -z "$(OS_ID)" ]; then                                                                                           \
+			echo "Error: OS not supported";                                                                                  \
+		else                                                                                                                 \
+			echo "Error: $(OS_ID) OS not supported";                                                                         \
 		fi;
 
 start:
