@@ -7,8 +7,8 @@ help:
 	@	echo "- Install dependencies:                    (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:                      $$ sudo make uninstall"
 	@	echo "- Configure:                               (2) $$ sudo make configure"
-	@	echo "- Assign network interface and IP address: (3) $$ sudo make iface_ip IFACE={string} IP={string}"
-	@	echo "- Start service:                           (4) $$ sudo make start"
+	@	echo "- Assign network interface and IP address:     $$ sudo make iface_ip IFACE={string} IP={string}"
+	@	echo "- Start service:                           (3) $$ sudo make start"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
 install:
