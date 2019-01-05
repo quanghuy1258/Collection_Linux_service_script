@@ -96,10 +96,10 @@ start:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                \
 			if [ -z "$$(systemctl status bind9.service | grep "Active: active ")" ]; then \
 				echo "===== Start bind9.service =====";                                   \
-				sudo systemctl start bind9.service;                                       \
+				systemctl start bind9.service;                                            \
 			else                                                                          \
 				echo "===== Restart bind9.service =====";                                 \
-				sudo systemctl restart bind9.service;                                     \
+				systemctl restart bind9.service;                                          \
 			fi;                                                                           \
 			echo "===== Done =====";                                                      \
 			exit;                                                                         \

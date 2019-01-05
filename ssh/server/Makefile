@@ -87,10 +87,10 @@ start:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                               \
 			if [ -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
 				echo "===== Start sshd.service =====";                                   \
-				sudo systemctl start sshd.service;                                       \
+				systemctl start sshd.service;                                            \
 			else                                                                         \
 				echo "===== Restart sshd.service =====";                                 \
-				sudo systemctl restart sshd.service;                                     \
+				systemctl restart sshd.service;                                          \
 			fi;                                                                          \
 			echo "===== Done =====";                                                     \
 			exit;                                                                        \

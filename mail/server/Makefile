@@ -28,6 +28,7 @@ install:
 				echo "===== Install dovecot-pop3d =====";                       \
 				apt-get -y install dovecot-pop3d;                               \
 			fi;                                                                 \
+			$(PATH_PWD)/squirrelmail/install.sh && exit;                        \
 			echo "===== Done =====";                                            \
 			exit;                                                               \
 		fi;                                                                     \
@@ -63,6 +64,7 @@ uninstall:
 				echo "===== Uninstall dovecot-pop3d =====";                                        \
 				apt-get -y purge dovecot-pop3d;                                                    \
 			fi;                                                                                    \
+			$(PATH_PWD)/squirrelmail/uninstall.sh && exit;                                         \
 			echo "===== Done =====";                                                               \
 			exit;                                                                                  \
 		fi;                                                                                        \
@@ -80,6 +82,7 @@ configure:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                     \
 			echo "===== Reconfigure postfix =====";                                                            \
 			dpkg-reconfigure postfix;                                                                          \
+			$(PATH_PWD)/squirrelmail/configure.sh && exit;                                                     \
 			echo "===== Done =====";                                                                           \
 			exit;                                                                                              \
 		fi;                                                                                                    \
@@ -97,18 +100,19 @@ start:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                  \
 			if [ -z "$$(systemctl status postfix.service | grep "Active: active ")" ]; then \
 				echo "===== Start postfix.service =====";                                   \
-				sudo systemctl start postfix.service;                                       \
+				systemctl start postfix.service;                                            \
 			else                                                                            \
 				echo "===== Restart postfix.service =====";                                 \
-				sudo systemctl restart postfix.service;                                     \
+				systemctl restart postfix.service;                                          \
 			fi;                                                                             \
 			if [ -z "$$(systemctl status dovecot.service | grep "Active: active ")" ]; then \
 				echo "===== Start dovecot.service =====";                                   \
-				sudo systemctl start dovecot.service;                                       \
+				systemctl start dovecot.service;                                            \
 			else                                                                            \
 				echo "===== Restart dovecot.service =====";                                 \
-				sudo systemctl restart dovecot.service;                                     \
+				systemctl restart dovecot.service;                                          \
 			fi;                                                                             \
+			$(PATH_PWD)/squirrelmail/start.sh && exit;                                      \
 			echo "===== Done =====";                                                        \
 			exit;                                                                           \
 		fi;                                                                                 \

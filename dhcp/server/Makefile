@@ -117,10 +117,10 @@ start:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                          \
 			if [ -z "$$(systemctl status isc-dhcp-server.service | grep "Active: active ")" ]; then \
 				echo "===== Start isc-dhcp-server.service =====";                                   \
-				sudo systemctl start isc-dhcp-server.service;                                       \
+				systemctl start isc-dhcp-server.service;                                            \
 			else                                                                                    \
 				echo "===== Restart isc-dhcp-server.service =====";                                 \
-				sudo systemctl restart isc-dhcp-server.service;                                     \
+				systemctl restart isc-dhcp-server.service;                                          \
 			fi;                                                                                     \
 			echo "===== Done =====";                                                                \
 			exit;                                                                                   \

@@ -19,6 +19,10 @@ if [ "$OS_ID" = "ubuntu" ]; then
 		echo "Info: Install tar";
 		apt-get -y install tar;
 	fi;
+	if [ -z "$(apt list --installed | grep "^perl/")" ]; then
+		echo "Info: Install perl";
+		apt-get -y install perl;
+	fi;
 
 	echo "Info: Install required packages";
 	if [ -z "$(apt list --installed | grep "^apache2/")" ]; then
@@ -36,7 +40,13 @@ if [ "$OS_ID" = "ubuntu" ]; then
 	wget https://sourceforge.net/projects/squirrelmail/files/stable/1.4.22/squirrelmail-webmail-1.4.22.tar.gz;
 	tar -xf squirrelmail-webmail-1.4.22.tar.gz;
 	rm -rf squirrelmail-webmail-1.4.22.tar.gz;
-	echo "===== Done =====";
+	mv squirrelmail-webmail-1.4.22 /var/www/html/squirrelmail/;
+	chown -R root:root /var/www/html/squirrelmail/;
+	mkdir -p /var/local/squirrelmail/data/;
+	chown -R www-data:www-data /var/local/squirrelmail/data/;
+	mkdir -p /var/local/squirrelmail/attach/;
+	chown -R www-data:www-data /var/local/squirrelmail/attach/;
+	echo "Info: Done";
 	exit 0;
 fi;
 if [ -z "$OS_ID" ]; then

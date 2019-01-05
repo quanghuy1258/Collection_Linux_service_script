@@ -119,10 +119,10 @@ start:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                 \
 			if [ -z "$$(systemctl status openvpn@client | grep "Active: active ")" ]; then \
 				echo "===== Start openvpn@client =====";                                   \
-				sudo systemctl start openvpn@client;                                       \
+				systemctl start openvpn@client;                                            \
 			else                                                                           \
 				echo "===== Restart openvpn@client =====";                                 \
-				sudo systemctl restart openvpn@client;                                     \
+				systemctl restart openvpn@client;                                          \
 			fi;                                                                            \
 			echo "===== Done =====";                                                       \
 			exit;                                                                          \
@@ -141,7 +141,7 @@ stop:
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                   \
 			if [ ! -z "$$(systemctl status openvpn@client | grep "Active: active ")" ]; then \
 				echo "===== Stop openvpn@client =====";                                      \
-				sudo systemctl stop openvpn@client;                                          \
+				systemctl stop openvpn@client;                                               \
 			fi;                                                                              \
 			echo "===== Done =====";                                                         \
 			exit;                                                                            \
