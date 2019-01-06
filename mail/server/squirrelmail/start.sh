@@ -7,7 +7,7 @@ if [ $(id -u) -ne 0 ]; then
 	exit 1;
 fi;
 
-OS_ID=$(cat /etc/os-release | grep "^id=" | cut -c 4-);
+OS_ID=$(cat /etc/os-release | grep "^ID=" | cut -c 4-);
 
 if [ "$OS_ID" = "ubuntu" ]; then
 	if [ -z "$(systemctl status apache2.service | grep "Active: active ")" ]; then
