@@ -145,6 +145,7 @@ configure_squirrelmail:
 			echo "Error: $(OS_ID) OS not supported";       \
 		fi;
 
+# Explanation of read line: https://stackoverflow.com/a/10929511
 configure_filtering:
 	@	if [ $$(id -u) -ne 0 ]; then                                                                                       \
 			echo "Error: Please run as root";                                                                              \
@@ -167,7 +168,7 @@ configure_filtering:
 				cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cf.bak;                                           \
 			fi;                                                                                                            \
 			touch $(PATH_PWD)/amavisd-new/master.cf;                                                                       \
-			while read line; do                                                                                            \
+			while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
 				printf "%s\n" "$$line" >>$(PATH_PWD)/amavisd-new/master.cf;                                                \
 				if [ ! -z "$$(printf "%s" "$$line" | grep "^pickup .* pickup$$")" ]; then                                  \
 					cat $(PATH_PWD)/amavisd-new/master.cf.pickup >>$(PATH_PWD)/amavisd-new/master.cf;                      \
