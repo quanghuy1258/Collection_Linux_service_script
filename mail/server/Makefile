@@ -212,19 +212,19 @@ start:
 				echo "===== Restart spamassassin.service =====";                                  \
 				systemctl restart spamassassin.service;                                           \
 			fi;                                                                                   \
-			if [ -z "$$(systemctl status amavis.service | grep "Active: active ")" ]; then        \
-				echo "===== Start amavis.service =====";                                          \
-				systemctl start amavis.service;                                                   \
-			else                                                                                  \
-				echo "===== Restart amavis.service =====";                                        \
-				systemctl restart amavis.service;                                                 \
-			fi;                                                                                   \
 			if [ -z "$$(systemctl status clamav-daemon.service | grep "Active: active ")" ]; then \
 				echo "===== Start clamav-daemon.service =====";                                   \
 				systemctl start clamav-daemon.service;                                            \
 			else                                                                                  \
 				echo "===== Restart clamav-daemon.service =====";                                 \
 				systemctl restart clamav-daemon.service;                                          \
+			fi;                                                                                   \
+			if [ -z "$$(systemctl status amavis.service | grep "Active: active ")" ]; then        \
+				echo "===== Start amavis.service =====";                                          \
+				systemctl start amavis.service;                                                   \
+			else                                                                                  \
+				echo "===== Restart amavis.service =====";                                        \
+				systemctl restart amavis.service;                                                 \
 			fi;                                                                                   \
 			echo "===== Done =====";                                                              \
 			exit;                                                                                 \
