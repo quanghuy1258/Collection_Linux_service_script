@@ -162,7 +162,7 @@ configure_filtering:
 			sed -re "s/#@/@/g" -i /etc/amavis/conf.d/15-content_filter_mode;                                               \
 			sed -re "s/#   \\\\/   \\\\/g" -i /etc/amavis/conf.d/15-content_filter_mode;                                   \
 			cp $(PATH_PWD)/amavisd-new/50-user /etc/amavis/conf.d/50-user;                                                 \
-			postconf -e 'content_filter = smtp-amavis:[127.0.0.1]:10024';                                                  \
+			postconf -e "content_filter = smtp-amavis:[127.0.0.1]:10024";                                                  \
 			if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/amavisd-new/master.cf.bak ]; then                       \
 				cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cf.bak;                                           \
 			fi;                                                                                                            \
