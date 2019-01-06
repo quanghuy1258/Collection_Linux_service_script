@@ -3,12 +3,14 @@ PATH_PWD := $(shell pwd)
 OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
 help:
-	@	echo "- Show help:                  $$ make help"
-	@	echo "- Install dependencies:   (1) $$ sudo make install"
-	@	echo "- Uninstall dependencies:     $$ sudo make uninstall"
-	@	echo "- Configure:              (2) $$ sudo make configure"
-	@	echo "- Start service:          (3) $$ sudo make start"
-	@	echo "RECOMMEND: (1) -> (2) -> (3)"
+	@	echo "- Show help:                    $$ make help"
+	@	echo "- Install dependencies:     (1) $$ sudo make install"
+	@	echo "- Uninstall dependencies:       $$ sudo make uninstall"
+	@	echo "- Configure postfix:        (2) $$ sudo make configure_postfix"
+	@	echo "- Configure squirrelmail:   (3) $$ sudo make configure_squirrelmail"
+	@	echo "- Configure mail filtering: (4) $$ sudo make configure_filtering"
+	@	echo "- Start service:            (5) $$ sudo make start"
+	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5)"
 
 install:
 	@	if [ $$(id -u) -ne 0 ]; then                                            \
@@ -28,7 +30,7 @@ install:
 				echo "===== Install dovecot-pop3d =====";                       \
 				apt-get -y install dovecot-pop3d;                               \
 			fi;                                                                 \
-			$(PATH_PWD)/squirrelmail/install.sh && exit;                        \
+			$(PATH_PWD)/squirrelmail/install.sh || exit;                        \
 			if [ -z "$$(apt list --installed | grep "^amavisd-new/")" ]; then   \
 				echo "===== Install amavisd-new =====";                         \
 				apt-get -y install amavisd-new;                                 \
@@ -88,7 +90,7 @@ uninstall:
 				echo "===== Uninstall dovecot-pop3d =====";                                         \
 				apt-get -y purge dovecot-pop3d;                                                     \
 			fi;                                                                                     \
-			$(PATH_PWD)/squirrelmail/uninstall.sh && exit;                                          \
+			$(PATH_PWD)/squirrelmail/uninstall.sh || exit;                                          \
 			if [ ! -z "$$(apt list --installed | grep "^amavisd-new/")" ]; then                     \
 				echo "===== Uninstall amavisd-new =====";                                           \
 				apt-get -y purge amavisd-new;                                                       \
@@ -110,20 +112,50 @@ uninstall:
 			echo "Error: $(OS_ID) OS not supported";                                                \
 		fi;
 
-configure:
+configure_postfix:
+	@	if [ $$(id -u) -ne 0 ]; then                 \
+			echo "Error: Please run as root";        \
+			exit;                                    \
+		fi;                                          \
+		if [ "$(OS_ID)" = "ubuntu" ]; then           \
+			echo "===== Configure postfix =====";    \
+			dpkg-reconfigure postfix;                \
+			echo "===== Done =====";                 \
+			exit;                                    \
+		fi;                                          \
+		if [ -z "$(OS_ID)" ]; then                   \
+			echo "Error: OS not supported";          \
+		else                                         \
+			echo "Error: $(OS_ID) OS not supported"; \
+		fi;
+
+configure_squirrelmail:
+	@	if [ $$(id -u) -ne 0 ]; then                       \
+			echo "Error: Please run as root";              \
+			exit;                                          \
+		fi;                                                \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                 \
+			$(PATH_PWD)/squirrelmail/configure.sh || exit; \
+			echo "===== Done =====";                       \
+			exit;                                          \
+		fi;                                                \
+		if [ -z "$(OS_ID)" ]; then                         \
+			echo "Error: OS not supported";                \
+		else                                               \
+			echo "Error: $(OS_ID) OS not supported";       \
+		fi;
+
+configure_filtering:
 	@	if [ $$(id -u) -ne 0 ]; then                                                                                       \
 			echo "Error: Please run as root";                                                                              \
 			exit;                                                                                                          \
 		fi;                                                                                                                \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                 \
+			echo "===== Configure mail filtering =====";                                                                   \
 			if [ ! -z "$$(shasum $(PATH_PWD)/amavisd-new/50-user | grep 20e5d384f6b75f01ec79cfe8c016499551494ac1)" ]; then \
 				echo "Error: Please modify amavisd-new/50-user file";                                                      \
 				exit;                                                                                                      \
 			fi;                                                                                                            \
-			echo "===== Reconfigure postfix =====";                                                                        \
-			dpkg-reconfigure postfix;                                                                                      \
-			$(PATH_PWD)/squirrelmail/configure.sh && exit;                                                                 \
-			echo "===== Configure amavisd-new spamassassin clamav-daemon =====";                                           \
 			adduser clamav amavis;                                                                                         \
 			adduser amavis clamav;                                                                                         \
 			sed -re "s/ENABLED=0/ENABLED=1/" -i /etc/default/spamassassin;                                                 \
@@ -131,15 +163,18 @@ configure:
 			sed -re "s/#   \\\\/   \\\\/g" -i /etc/amavis/conf.d/15-content_filter_mode;                                   \
 			cp $(PATH_PWD)/amavisd-new/50-user /etc/amavis/conf.d/50-user;                                                 \
 			postconf -e 'content_filter = smtp-amavis:[127.0.0.1]:10024';                                                  \
-			touch $(PATH_PWD)/tmp.txt;                                                                                     \
+			if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/amavisd-new/master.cfi.bak ]; then                      \
+				cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cfi.bak;                                          \
+			fi;                                                                                                            \
+			touch $(PATH_PWD)/amavisd-new/master.cfi;                                                                      \
 			while read line do                                                                                             \
-				echo $$line >>$(PATH_PWD)/tmp.txt;                                                                         \
+				echo $$line >>$(PATH_PWD)/amavisd-new/master.cfi;                                                          \
 				if [ ! -z "$$(echo $$line | grep "^pickup .*$$")" ];                                                       \
-					cat $(PATH_PWD)/amavisd-new/master.cfi.pickup >>$(PATH_PWD)/tmp.txt;                                   \
+					cat $(PATH_PWD)/amavisd-new/master.cfi.pickup >>$(PATH_PWD)/amavisd-new/master.cfi;                    \
 				fi;                                                                                                        \
-			done </etc/postfix/master.cf;                                                                                  \
-			cat $(PATH_PWD)/amavisd-new/master.cfi.EOF >>$(PATH_PWD)/tmp.txt;                                              \
-			mv $(PATH_PWD)/tmp.txt /etc/postfix/master.cf;                                                                 \
+			done <$(PATH_PWD)/amavisd-new/master.cfi.bak;                                                                  \
+			cat $(PATH_PWD)/amavisd-new/master.cfi.EOF >>$(PATH_PWD)/amavisd-new/master.cfi;                               \
+			mv $(PATH_PWD)/amavisd-new/master.cfi /etc/postfix/master.cf;                                                  \
 			echo "===== Done =====";                                                                                       \
 			exit;                                                                                                          \
 		fi;                                                                                                                \
@@ -169,7 +204,7 @@ start:
 				echo "===== Restart dovecot.service =====";                                       \
 				systemctl restart dovecot.service;                                                \
 			fi;                                                                                   \
-			$(PATH_PWD)/squirrelmail/start.sh && exit;                                            \
+			$(PATH_PWD)/squirrelmail/start.sh || exit;                                            \
 			if [ -z "$$(systemctl status spamassassin.service | grep "Active: active ")" ]; then  \
 				echo "===== Start spamassassin.service =====";                                    \
 				systemctl start spamassassin.service;                                             \
