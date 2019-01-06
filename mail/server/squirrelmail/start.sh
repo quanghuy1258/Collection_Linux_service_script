@@ -11,10 +11,10 @@ OS_ID=$(cat /etc/os-release | grep "^ID=" | cut -c 4-);
 
 if [ "$OS_ID" = "ubuntu" ]; then
 	if [ -z "$(systemctl status apache2.service | grep "Active: active ")" ]; then
-		echo "Info: Start apache2.service =====";
+		echo "Info: Start apache2.service";
 		systemctl start apache2.service;
 	else
-		echo "Info: Restart apache2.service =====";
+		echo "Info: Restart apache2.service";
 		systemctl restart apache2.service;
 	fi;
 	echo "Info: Done";
