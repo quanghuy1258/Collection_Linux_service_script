@@ -190,21 +190,6 @@ start:
 			exit;                                                                                 \
 		fi;                                                                                       \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                        \
-			if [ -z "$$(systemctl status postfix.service | grep "Active: active ")" ]; then       \
-				echo "===== Start postfix.service =====";                                         \
-				systemctl start postfix.service;                                                  \
-			else                                                                                  \
-				echo "===== Restart postfix.service =====";                                       \
-				systemctl restart postfix.service;                                                \
-			fi;                                                                                   \
-			if [ -z "$$(systemctl status dovecot.service | grep "Active: active ")" ]; then       \
-				echo "===== Start dovecot.service =====";                                         \
-				systemctl start dovecot.service;                                                  \
-			else                                                                                  \
-				echo "===== Restart dovecot.service =====";                                       \
-				systemctl restart dovecot.service;                                                \
-			fi;                                                                                   \
-			$(PATH_PWD)/squirrelmail/start.sh || exit;                                            \
 			if [ -z "$$(systemctl status spamassassin.service | grep "Active: active ")" ]; then  \
 				echo "===== Start spamassassin.service =====";                                    \
 				systemctl start spamassassin.service;                                             \
@@ -226,6 +211,21 @@ start:
 				echo "===== Restart amavis.service =====";                                        \
 				systemctl restart amavis.service;                                                 \
 			fi;                                                                                   \
+			if [ -z "$$(systemctl status postfix.service | grep "Active: active ")" ]; then       \
+				echo "===== Start postfix.service =====";                                         \
+				systemctl start postfix.service;                                                  \
+			else                                                                                  \
+				echo "===== Restart postfix.service =====";                                       \
+				systemctl restart postfix.service;                                                \
+			fi;                                                                                   \
+			if [ -z "$$(systemctl status dovecot.service | grep "Active: active ")" ]; then       \
+				echo "===== Start dovecot.service =====";                                         \
+				systemctl start dovecot.service;                                                  \
+			else                                                                                  \
+				echo "===== Restart dovecot.service =====";                                       \
+				systemctl restart dovecot.service;                                                \
+			fi;                                                                                   \
+			$(PATH_PWD)/squirrelmail/start.sh || exit;                                            \
 			echo "===== Done =====";                                                              \
 			exit;                                                                                 \
 		fi;                                                                                       \
