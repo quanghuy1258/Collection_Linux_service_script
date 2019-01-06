@@ -168,8 +168,8 @@ configure_filtering:
 			fi;                                                                                                            \
 			touch $(PATH_PWD)/amavisd-new/master.cf;                                                                       \
 			while read line; do                                                                                            \
-				echo $$line >>$(PATH_PWD)/amavisd-new/master.cf;                                                           \
-				if [ ! -z "$$(echo $$line | grep "^pickup .*$$")" ]; then                                                  \
+				printf "%s\n" "$$line" >>$(PATH_PWD)/amavisd-new/master.cf;                                                \
+				if [ ! -z "$$(printf "%s" "$$line" | grep "^pickup .* pickup$$")" ]; then                                  \
 					cat $(PATH_PWD)/amavisd-new/master.cf.pickup >>$(PATH_PWD)/amavisd-new/master.cf;                      \
 				fi;                                                                                                        \
 			done <$(PATH_PWD)/amavisd-new/master.cf.bak;                                                                   \
