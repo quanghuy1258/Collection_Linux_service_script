@@ -167,7 +167,7 @@ configure_filtering:
 				cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cfi.bak;                                          \
 			fi;                                                                                                            \
 			touch $(PATH_PWD)/amavisd-new/master.cfi;                                                                      \
-			while read line do                                                                                             \
+			while read line; do                                                                                            \
 				echo $$line >>$(PATH_PWD)/amavisd-new/master.cfi;                                                          \
 				if [ ! -z "$$(echo $$line | grep "^pickup .*$$")" ];                                                       \
 					cat $(PATH_PWD)/amavisd-new/master.cfi.pickup >>$(PATH_PWD)/amavisd-new/master.cfi;                    \
