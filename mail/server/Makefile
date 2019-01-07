@@ -173,18 +173,21 @@ configure_filtering:
 			sed -re "s/#   \\\\/   \\\\/g" -i /etc/amavis/conf.d/15-content_filter_mode;                                   \
 			cp $(PATH_PWD)/amavisd-new/50-user /etc/amavis/conf.d/50-user;                                                 \
 			postconf -e 'content_filter = smtp-amavis:[127.0.0.1]:10024';                                                  \
-			if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/amavisd-new/master.cf.bak ]; then                       \
-				cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cf.bak;                                           \
-			fi;                                                                                                            \
-			touch $(PATH_PWD)/amavisd-new/master.cf;                                                                       \
-			while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
-				printf "%s\n" "$$line" >>$(PATH_PWD)/amavisd-new/master.cf;                                                \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "^pickup .* pickup$$")" ]; then                                  \
-					cat $(PATH_PWD)/amavisd-new/master.cf.pickup >>$(PATH_PWD)/amavisd-new/master.cf;                      \
+			if [ -z "$$(cat /etc/postfix/master.cf | grep " Configured: configure_filtering")" ]; then                     \
+				if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/amavisd-new/master.cf.bak ]; then                   \
+					cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cf.bak;                                       \
 				fi;                                                                                                        \
-			done <$(PATH_PWD)/amavisd-new/master.cf.bak;                                                                   \
-			cat $(PATH_PWD)/amavisd-new/master.cf.EOF >>$(PATH_PWD)/amavisd-new/master.cf;                                 \
-			mv $(PATH_PWD)/amavisd-new/master.cf /etc/postfix/master.cf;                                                   \
+				rm /etc/postfix/master.cf;                                                                                 \
+				touch /etc/postfix/master.cf;                                                                              \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                         \
+					printf "%s\n" "$$line" >>/etc/postfix/master.cf;                                                       \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "^pickup .* pickup$$")" ]; then                              \
+						cat $(PATH_PWD)/amavisd-new/master.cf.pickup >>/etc/postfix/master.cf;                             \
+					fi;                                                                                                    \
+				done <$(PATH_PWD)/amavisd-new/master.cf.bak;                                                               \
+				cat $(PATH_PWD)/amavisd-new/master.cf.EOF >>/etc/postfix/master.cf;                                        \
+				printf "%s\n" "# Configured: configure_filtering" >>/etc/postfix/master.cf;                                \
+			fi;                                                                                                            \
 			echo "===== Done =====";                                                                                       \
 			exit;                                                                                                          \
 		fi;                                                                                                                \
@@ -195,99 +198,108 @@ configure_filtering:
 		fi;
 
 configure_ssl:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                                                     \
-			echo "Error: Please run as root";                                                                                            \
-			exit;                                                                                                                        \
-		fi;                                                                                                                              \
-		if [ ! -f $(PATH_PWD)/ssl/smtpd.key ]; then                                                                                      \
-			echo "Error: File ssl/smtpd.key not found";                                                                                  \
-			exit;                                                                                                                        \
-		fi;                                                                                                                              \
-		if [ ! -f $(PATH_PWD)/ssl/smtpd.crt ]; then                                                                                      \
-			echo "Error: File ssl/smtpd.crt not found";                                                                                  \
-			exit;                                                                                                                        \
-		fi;                                                                                                                              \
-		if [ ! -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                                     \
-			echo "Warning: File ssl/cacert.pem not found";                                                                               \
-		fi;                                                                                                                              \
-		if [ -z $(MYHOSTNAME) ]; then                                                                                                    \
-			echo "Error: MYHOSTNAME arg is not set";                                                                                     \
-			exit;                                                                                                                        \
-		fi;                                                                                                                              \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                               \
-			echo "===== Configure SSL =====";                                                                                            \
-			echo "Info: Init";                                                                                                           \
-			cp $(PATH_PWD)/ssl/smtpd.key /etc/ssl/private/smtpd.key;                                                                     \
-			cp $(PATH_PWD)/ssl/smtpd.crt /etc/ssl/certs/smtpd.crt;                                                                       \
-			if [ -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                                   \
-				cp $(PATH_PWD)/ssl/cacert.pem /etc/ssl/certs/cacert.pem;                                                                 \
-			else                                                                                                                         \
-				if [ ! -f /etc/ssl/certs/cacert.pem ]; then                                                                              \
-					echo "Error: File /etc/ssl/certs/cacert.pem not found";                                                              \
-					exit;                                                                                                                \
-				fi;                                                                                                                      \
-			fi;                                                                                                                          \
-			cat /etc/ssl/certs/smtpd.crt /etc/ssl/certs/cacert.pem >/etc/ssl/certs/dovecot.crt;                                          \
-			echo "Info: Configure Postfix for SMTP-AUTH using SASL (Dovecot SASL)";                                                      \
-			postconf -e 'smtpd_sasl_type = dovecot';                                                                                     \
-			postconf -e 'smtpd_sasl_path = private/auth';                                                                                \
-			postconf -e 'smtpd_sasl_local_domain =';                                                                                     \
-			postconf -e 'smtpd_sasl_security_options = noanonymous';                                                                     \
-			postconf -e 'broken_sasl_auth_clients = yes';                                                                                \
-			postconf -e 'smtpd_sasl_auth_enable = yes';                                                                                  \
-			postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination';          \
-			echo "Info: Configure Postfix to provide TLS encryption for both incoming and outgoing mail";                                \
-			postconf -e 'smtp_tls_security_level = may';                                                                                 \
-			postconf -e 'smtpd_tls_security_level = may';                                                                                \
-			postconf -e 'smtp_tls_note_starttls_offer = yes';                                                                            \
-			postconf -e 'smtpd_tls_key_file = /etc/ssl/private/smtpd.key';                                                               \
-			postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/smtpd.crt';                                                                \
-			postconf -e 'smtpd_tls_loglevel = 1';                                                                                        \
-			postconf -e 'smtpd_tls_received_header = yes';                                                                               \
-			postconf -e 'myhostname = $(MYHOSTNAME)';                                                                                    \
-			postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem';                                                                  \
-			echo "Info: Configure SASL";                                                                                                 \
-			if [ -z $$(cat /etc/dovecot/conf.d/10-master.conf | grep -E "^[^#]*unix_listener /var/spool/postfix/private/auth {") ]; then \
-				if [ -f /etc/dovecot/conf.d/10-master.conf ] && [ ! -f /etc/dovecot/conf.d/10-master.conf.bak ]; then                    \
-					cp /etc/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf.bak;                                        \
-				fi;                                                                                                                      \
-				rm -rf /etc/dovecot/conf.d/10-master.conf;                                                                               \
-				touch /etc/dovecot/conf.d/10-master.conf;                                                                                \
-				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                                       \
-					printf "%s\n" "$$line" >>/etc/dovecot/conf.d/10-master.conf;                                                         \
-					if [ ! -z "$$(printf "%s" "$$line" | grep "^service auth ")" ]; then                                                 \
-						cat $(PATH_PWD)/ssl/10-master.conf >>/etc/dovecot/conf.d/10-master.conf;                                         \
-					fi;                                                                                                                  \
-				done </etc/dovecot/conf.d/10-master.conf.bak;                                                                            \
-			fi;                                                                                                                          \
-			echo "Info: Configure Dovecot SSL";                                                                                          \
-			if [ -f /etc/dovecot/conf.d/10-ssl.conf ] && [ ! -f /etc/dovecot/conf.d/10-ssl.conf.bak ]; then                              \
-				cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.bak;                                                  \
-			fi;                                                                                                                          \
-			rm -rf /etc/dovecot/conf.d/10-ssl.conf;                                                                                      \
-			touch /etc/dovecot/conf.d/10-ssl.conf;                                                                                       \
-			while IFS='' read -r line || [[ -n "$$line" ]]; do                                                                           \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl[ ]*=")" ]; then                                                          \
-					printf "%s\n" "ssl = yes" >>/etc/dovecot/conf.d/10-ssl.conf;                                                         \
-					continue;                                                                                                            \
-				fi;                                                                                                                      \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl_cert[ ]*=")" ]; then                                                     \
-					printf "%s\n" "ssl_cert = /etc/ssl/certs/dovecot.crt" >>/etc/dovecot/conf.d/10-ssl.conf;                             \
-					continue;                                                                                                            \
-				fi;                                                                                                                      \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl_key[ ]*=")" ]; then                                                      \
-					printf "%s\n" "ssl_key = /etc/ssl/certs/smtpd.key" >>/etc/dovecot/conf.d/10-ssl.conf;                                \
-					continue;                                                                                                            \
-				fi;                                                                                                                      \
-				printf "%s\n" "$$line" >>/etc/dovecot/conf.d/10-ssl.conf;                                                                \
-			done </etc/dovecot/conf.d/10-ssl.conf.bak;                                                                                   \
-			echo "===== Done =====";                                                                                                     \
-			exit;                                                                                                                        \
-		fi;                                                                                                                              \
-		if [ -z "$(OS_ID)" ]; then                                                                                                       \
-			echo "Error: OS not supported";                                                                                              \
-		else                                                                                                                             \
-			echo "Error: $(OS_ID) OS not supported";                                                                                     \
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                            \
+			echo "Error: Please run as root";                                                                                   \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ ! -f $(PATH_PWD)/ssl/smtpd.key ]; then                                                                             \
+			echo "Error: File ssl/smtpd.key not found";                                                                         \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ ! -f $(PATH_PWD)/ssl/smtpd.crt ]; then                                                                             \
+			echo "Error: File ssl/smtpd.crt not found";                                                                         \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ ! -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                            \
+			echo "Warning: File ssl/cacert.pem not found";                                                                      \
+		fi;                                                                                                                     \
+		if [ -z $(MYHOSTNAME) ]; then                                                                                           \
+			echo "Error: MYHOSTNAME arg is not set";                                                                            \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                      \
+			echo "===== Configure SSL =====";                                                                                   \
+			echo "Info: Init";                                                                                                  \
+			cp $(PATH_PWD)/ssl/smtpd.key /etc/ssl/private/smtpd.key;                                                            \
+			cp $(PATH_PWD)/ssl/smtpd.crt /etc/ssl/certs/smtpd.crt;                                                              \
+			if [ -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                          \
+				cp $(PATH_PWD)/ssl/cacert.pem /etc/ssl/certs/cacert.pem;                                                        \
+			else                                                                                                                \
+				if [ ! -f /etc/ssl/certs/cacert.pem ]; then                                                                     \
+					echo "Error: File /etc/ssl/certs/cacert.pem not found";                                                     \
+					exit;                                                                                                       \
+				fi;                                                                                                             \
+			fi;                                                                                                                 \
+			cat /etc/ssl/certs/smtpd.crt /etc/ssl/certs/cacert.pem >/etc/ssl/certs/dovecot.crt;                                 \
+			echo "Info: Configure Postfix for SMTP-AUTH using SASL (Dovecot SASL)";                                             \
+			postconf -e 'smtpd_sasl_type = dovecot';                                                                            \
+			postconf -e 'smtpd_sasl_path = private/auth';                                                                       \
+			postconf -e 'smtpd_sasl_local_domain =';                                                                            \
+			postconf -e 'smtpd_sasl_security_options = noanonymous';                                                            \
+			postconf -e 'broken_sasl_auth_clients = yes';                                                                       \
+			postconf -e 'smtpd_sasl_auth_enable = yes';                                                                         \
+			postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'; \
+			echo "Info: Configure Postfix to provide TLS encryption for both incoming and outgoing mail";                       \
+			postconf -e 'smtp_tls_security_level = may';                                                                        \
+			postconf -e 'smtpd_tls_security_level = may';                                                                       \
+			postconf -e 'smtp_tls_note_starttls_offer = yes';                                                                   \
+			postconf -e 'smtpd_tls_key_file = /etc/ssl/private/smtpd.key';                                                      \
+			postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/smtpd.crt';                                                       \
+			postconf -e 'smtpd_tls_loglevel = 1';                                                                               \
+			postconf -e 'smtpd_tls_received_header = yes';                                                                      \
+			postconf -e 'myhostname = $(MYHOSTNAME)';                                                                           \
+			postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem';                                                         \
+			echo "Info: Configure SASL";                                                                                        \
+			if [ -z $$(cat /etc/dovecot/conf.d/10-master.conf | grep -E " Configured: configure_ssl") ]; then                   \
+				if [ -f /etc/dovecot/conf.d/10-master.conf ] && [ ! -f /etc/dovecot/conf.d/10-master.conf.bak ]; then           \
+					cp /etc/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf.bak;                               \
+				fi;                                                                                                             \
+				rm -rf /etc/dovecot/conf.d/10-master.conf;                                                                      \
+				touch /etc/dovecot/conf.d/10-master.conf;                                                                       \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                              \
+					printf "%s\n" "$$line" >>/etc/dovecot/conf.d/10-master.conf;                                                \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "^service auth ")" ]; then                                        \
+						cat $(PATH_PWD)/ssl/10-master.conf >>/etc/dovecot/conf.d/10-master.conf;                                \
+					fi;                                                                                                         \
+				done </etc/dovecot/conf.d/10-master.conf.bak;                                                                   \
+				printf "%s\n" "# Configured: configure_ssl" >>/etc/dovecot/conf.d/10-master.conf;                               \
+			fi;                                                                                                                 \
+			echo "Info: Configure smtps";                                                                                       \
+			if [ -z "$$(cat /etc/postfix/master.cf | grep " Configured: configure_ssl")" ]; then                                \
+				if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/ssl/master.cf.bak ]; then                                \
+					cp /etc/postfix/master.cf $(PATH_PWD)/ssl/master.cf.bak;                                                    \
+				fi;                                                                                                             \
+				cat $(PATH_PWD)/ssl/master.cf >>/etc/postfix/master.cf;                                                         \
+				printf "%s\n" "# Configured: configure_filtering" >>/etc/postfix/master.cf;                                     \
+			fi;                                                                                                                 \
+			echo "Info: Configure Dovecot SSL";                                                                                 \
+			if [ -f /etc/dovecot/conf.d/10-ssl.conf ] && [ ! -f /etc/dovecot/conf.d/10-ssl.conf.bak ]; then                     \
+				cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.bak;                                         \
+			fi;                                                                                                                 \
+			rm -rf /etc/dovecot/conf.d/10-ssl.conf;                                                                             \
+			touch /etc/dovecot/conf.d/10-ssl.conf;                                                                              \
+			while IFS='' read -r line || [[ -n "$$line" ]]; do                                                                  \
+				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl[ ]*=")" ]; then                                                 \
+					printf "%s\n" "ssl = yes" >>/etc/dovecot/conf.d/10-ssl.conf;                                                \
+					continue;                                                                                                   \
+				fi;                                                                                                             \
+				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl_cert[ ]*=")" ]; then                                            \
+					printf "%s\n" "ssl_cert = /etc/ssl/certs/dovecot.crt" >>/etc/dovecot/conf.d/10-ssl.conf;                    \
+					continue;                                                                                                   \
+				fi;                                                                                                             \
+				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl_key[ ]*=")" ]; then                                             \
+					printf "%s\n" "ssl_key = /etc/ssl/certs/smtpd.key" >>/etc/dovecot/conf.d/10-ssl.conf;                       \
+					continue;                                                                                                   \
+				fi;                                                                                                             \
+				printf "%s\n" "$$line" >>/etc/dovecot/conf.d/10-ssl.conf;                                                       \
+			done </etc/dovecot/conf.d/10-ssl.conf.bak;                                                                          \
+			echo "===== Done =====";                                                                                            \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ -z "$(OS_ID)" ]; then                                                                                              \
+			echo "Error: OS not supported";                                                                                     \
+		else                                                                                                                    \
+			echo "Error: $(OS_ID) OS not supported";                                                                            \
 		fi;
 
 start:
