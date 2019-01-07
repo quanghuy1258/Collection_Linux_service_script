@@ -202,26 +202,26 @@ configure_ssl:
 			echo "Error: Please run as root";                                                                                   \
 			exit;                                                                                                               \
 		fi;                                                                                                                     \
-		if [ ! -f $(PATH_PWD)/ssl/smtpd.key ]; then                                                                             \
-			echo "Error: File ssl/smtpd.key not found";                                                                         \
+		if [ -z $(MYHOSTNAME) ]; then                                                                                           \
+			echo "Error: MYHOSTNAME arg is not set";                                                                            \
 			exit;                                                                                                               \
 		fi;                                                                                                                     \
-		if [ ! -f $(PATH_PWD)/ssl/smtpd.crt ]; then                                                                             \
-			echo "Error: File ssl/smtpd.crt not found";                                                                         \
+		if [ ! -f $(PATH_PWD)/ssl/$(MYHOSTNAME).key ]; then                                                                     \
+			echo "Error: File ssl/$(MYHOSTNAME).key not found";                                                                 \
+			exit;                                                                                                               \
+		fi;                                                                                                                     \
+		if [ ! -f $(PATH_PWD)/ssl/$(MYHOSTNAME).crt ]; then                                                                     \
+			echo "Error: File ssl/$(MYHOSTNAME).crt not found";                                                                 \
 			exit;                                                                                                               \
 		fi;                                                                                                                     \
 		if [ ! -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                            \
 			echo "Warning: File ssl/cacert.pem not found";                                                                      \
 		fi;                                                                                                                     \
-		if [ -z $(MYHOSTNAME) ]; then                                                                                           \
-			echo "Error: MYHOSTNAME arg is not set";                                                                            \
-			exit;                                                                                                               \
-		fi;                                                                                                                     \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                      \
 			echo "===== Configure SSL =====";                                                                                   \
 			echo "Info: Init";                                                                                                  \
-			cp $(PATH_PWD)/ssl/smtpd.key /etc/ssl/private/smtpd.key;                                                            \
-			cp $(PATH_PWD)/ssl/smtpd.crt /etc/ssl/certs/smtpd.crt;                                                              \
+			cp $(PATH_PWD)/ssl/$(MYHOSTNAME).key /etc/ssl/private/$(MYHOSTNAME).key;                                            \
+			cp $(PATH_PWD)/ssl/$(MYHOSTNAME).crt /etc/ssl/certs/$(MYHOSTNAME).crt;                                              \
 			if [ -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                          \
 				cp $(PATH_PWD)/ssl/cacert.pem /etc/ssl/certs/cacert.pem;                                                        \
 			else                                                                                                                \
@@ -230,7 +230,7 @@ configure_ssl:
 					exit;                                                                                                       \
 				fi;                                                                                                             \
 			fi;                                                                                                                 \
-			cat /etc/ssl/certs/smtpd.crt /etc/ssl/certs/cacert.pem >/etc/ssl/certs/dovecot.crt;                                 \
+			cat /etc/ssl/certs/$(MYHOSTNAME).crt /etc/ssl/certs/cacert.pem >/etc/ssl/certs/dovecot.crt;                         \
 			echo "Info: Configure Postfix for SMTP-AUTH using SASL (Dovecot SASL)";                                             \
 			postconf -e 'smtpd_sasl_type = dovecot';                                                                            \
 			postconf -e 'smtpd_sasl_path = private/auth';                                                                       \
@@ -243,8 +243,8 @@ configure_ssl:
 			postconf -e 'smtp_tls_security_level = may';                                                                        \
 			postconf -e 'smtpd_tls_security_level = may';                                                                       \
 			postconf -e 'smtp_tls_note_starttls_offer = yes';                                                                   \
-			postconf -e 'smtpd_tls_key_file = /etc/ssl/private/smtpd.key';                                                      \
-			postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/smtpd.crt';                                                       \
+			postconf -e 'smtpd_tls_key_file = /etc/ssl/private/$(MYHOSTNAME).key';                                              \
+			postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/$(MYHOSTNAME).crt';                                               \
 			postconf -e 'smtpd_tls_loglevel = 1';                                                                               \
 			postconf -e 'smtpd_tls_received_header = yes';                                                                      \
 			postconf -e 'myhostname = $(MYHOSTNAME)';                                                                           \
@@ -288,7 +288,7 @@ configure_ssl:
 					continue;                                                                                                   \
 				fi;                                                                                                             \
 				if [ ! -z "$$(printf "%s" "$$line" | grep "^ssl_key[ ]*=")" ]; then                                             \
-					printf "%s\n" "ssl_key = /etc/ssl/certs/smtpd.key" >>/etc/dovecot/conf.d/10-ssl.conf;                       \
+					printf "%s\n" "ssl_key = /etc/ssl/certs/$(MYHOSTNAME).key" >>/etc/dovecot/conf.d/10-ssl.conf;               \
 					continue;                                                                                                   \
 				fi;                                                                                                             \
 				printf "%s\n" "$$line" >>/etc/dovecot/conf.d/10-ssl.conf;                                                       \
