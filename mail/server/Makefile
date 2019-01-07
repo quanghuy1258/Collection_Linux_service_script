@@ -19,6 +19,10 @@ install:
 			exit;                                                               \
 		fi;                                                                     \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                      \
+			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then       \
+				echo "===== Install openssl =====";                             \
+				apt-get -y install openssl;                                     \
+			fi;                                                                 \
 			if [ -z "$$(apt list --installed | grep "^postfix/")" ]; then       \
 				echo "===== Install postfix =====";                             \
 				apt-get -y install postfix;                                     \
@@ -230,6 +234,9 @@ configure_ssl:
 					exit;                                                                                                               \
 				fi;                                                                                                                     \
 			fi;                                                                                                                         \
+			hash=$$(openssl x509 -noout -hash -in /etc/ssl/certs/cacert.pem);                                                           \
+			rm -rf /etc/ssl/certs/$$hash.0;                                                                                             \
+			ln -s /etc/ssl/certs/cacert.pem /etc/ssl/certs/$$hash.0;                                                                    \
 			cat /etc/ssl/certs/$(MYHOSTNAME).crt /etc/ssl/certs/cacert.pem >/etc/ssl/certs/dovecot.crt;                                 \
 			echo "Info: Configure Postfix for SMTP-AUTH using SASL (Dovecot SASL)";                                                     \
 			postconf -e 'smtpd_sasl_type = dovecot';                                                                                    \
