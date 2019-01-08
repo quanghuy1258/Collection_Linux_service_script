@@ -13,69 +13,69 @@ help:
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
 install:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                      \
-			echo "Error: Please run as root";                                                             \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                \
-			if [ -z "$$(apt list --installed | grep "^apache2/")" ]; then                                 \
-				echo "===== Install apache2 =====";                                                       \
-				sudo apt-get -y install apache2;                                                          \
-			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep "^mysql-server/")" ]; then                            \
-				echo "===== Install mysql-server =====";                                                  \
-				sudo apt-get -y install mysql-server;                                                     \
-			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep "^php/")" ]; then                                     \
-				echo "===== Install php =====";                                                           \
-				sudo apt-get -y install php libapache2-mod-php php-cli php-cgi php-mysql;                 \
-			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                                 \
-				echo "===== Install openssl =====";                                                       \
-				sudo apt-get -y install openssl;                                                          \
-			fi;                                                                                           \
-			echo "===== Done =====";                                                                      \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		if [ -z "$(OS_ID)" ]; then                                                                        \
-			echo "Error: OS not supported";                                                               \
-		else                                                                                              \
-			echo "Error: $(OS_ID) OS not supported";                                                      \
+	@	if [ $$(id -u) -ne 0 ]; then                                                      \
+			echo "Error: Please run as root";                                             \
+			exit;                                                                         \
+		fi;                                                                               \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                \
+			if [ -z "$$(apt list --installed | grep "^apache2/")" ]; then                 \
+				echo "===== Install apache2 =====";                                       \
+				sudo apt-get -y install apache2;                                          \
+			fi;                                                                           \
+			if [ -z "$$(apt list --installed | grep "^mysql-server/")" ]; then            \
+				echo "===== Install mysql-server =====";                                  \
+				sudo apt-get -y install mysql-server;                                     \
+			fi;                                                                           \
+			if [ -z "$$(apt list --installed | grep "^php/")" ]; then                     \
+				echo "===== Install php =====";                                           \
+				sudo apt-get -y install php libapache2-mod-php php-cli php-cgi php-mysql; \
+			fi;                                                                           \
+			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                 \
+				echo "===== Install openssl =====";                                       \
+				sudo apt-get -y install openssl;                                          \
+			fi;                                                                           \
+			echo "===== Done =====";                                                      \
+			exit;                                                                         \
+		fi;                                                                               \
+		if [ -z "$(OS_ID)" ]; then                                                        \
+			echo "Error: OS not supported";                                               \
+		else                                                                              \
+			echo "Error: $(OS_ID) OS not supported";                                      \
 		fi;
 
 uninstall:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                \
-			echo "Error: Please run as root";                                                       \
-			exit;                                                                                   \
-		fi;                                                                                         \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                          \
-			if [ ! -z "$$(systemctl status apache2.service | grep "Active: active ")" ]; then       \
-				echo "===== Stop apache2.service =====";                                            \
-				systemctl stop apache2.service;                                                     \
-			fi;                                                                                     \
-			if [ ! -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then         \
-				echo "===== Stop mysql.service =====";                                              \
-				systemctl stop mysql.service;                                                       \
-			fi;                                                                                     \
-			if [ ! -z "$$(apt list --installed | grep "^apache2/")" ]; then                         \
-				echo "===== Uninstall apache2 =====";                                               \
-				apt-get -y purge apache2;                                                           \
-			fi;                                                                                     \
-			if [ ! -z "$$(apt list --installed | grep "^mysql-server/")" ]; then                    \
-				echo "===== Uninstall mysql-server =====";                                          \
-				apt-get -y purge mysql-server;                                                      \
-			fi;                                                                                     \
-			if [ ! -z "$$(apt list --installed | grep "^php/")" ]; then                             \
-				echo "===== Uninstall php =====";                                                   \
-				apt-get -y purge php libapache2-mod-php php-cli php-cgi php-mysql;                  \
-			fi;                                                                                     \
-			echo "===== Done =====";                                                                \
-			exit;                                                                                   \
-		fi;                                                                                         \
-		if [ -z "$(OS_ID)" ]; then                                                                  \
-			echo "Error: OS not supported";                                                         \
-		else                                                                                        \
-			echo "Error: $(OS_ID) OS not supported";                                                \
+	@	if [ $$(id -u) -ne 0 ]; then                                                          \
+			echo "Error: Please run as root";                                                 \
+			exit;                                                                             \
+		fi;                                                                                   \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                    \
+			if [ ! -z "$$(systemctl status apache2.service | grep "Active: active ")" ]; then \
+				echo "===== Stop apache2.service =====";                                      \
+				systemctl stop apache2.service;                                               \
+			fi;                                                                               \
+			if [ ! -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then   \
+				echo "===== Stop mysql.service =====";                                        \
+				systemctl stop mysql.service;                                                 \
+			fi;                                                                               \
+			if [ ! -z "$$(apt list --installed | grep "^apache2/")" ]; then                   \
+				echo "===== Uninstall apache2 =====";                                         \
+				apt-get -y purge apache2;                                                     \
+			fi;                                                                               \
+			if [ ! -z "$$(apt list --installed | grep "^mysql-server/")" ]; then              \
+				echo "===== Uninstall mysql-server =====";                                    \
+				apt-get -y purge mysql-server;                                                \
+			fi;                                                                               \
+			if [ ! -z "$$(apt list --installed | grep "^php/")" ]; then                       \
+				echo "===== Uninstall php =====";                                             \
+				apt-get -y purge php libapache2-mod-php php-cli php-cgi php-mysql;            \
+			fi;                                                                               \
+			echo "===== Done =====";                                                          \
+			exit;                                                                             \
+		fi;                                                                                   \
+		if [ -z "$(OS_ID)" ]; then                                                            \
+			echo "Error: OS not supported";                                                   \
+		else                                                                                  \
+			echo "Error: $(OS_ID) OS not supported";                                          \
 		fi;
 
 configure:
@@ -247,81 +247,81 @@ configure_host:
 		fi;
 
 configure_wordpress:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                    \
-			echo "Error: Please run as root";                                                           \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(NAME) ]; then                                                                         \
-			echo "Error: NAME arg is not set";                                                          \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(USER) ]; then                                                                         \
-			echo "Error: USER arg is not set";                                                          \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(PASSWORD) ]; then                                                                     \
-			echo "Error: PASSWORD arg is not set";                                                      \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(HOST) ]; then                                                                         \
-			echo "Error: DB_HOST arg is not set";                                                       \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ ! -f /etc/apache2/sites-available/$(HOST).conf ]; then                                     \
-			echo "Error: Site $(HOST) is not set";                                                      \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
-			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then               \
-				echo "===== Start mysql.service =====";                                                 \
-				systemctl start mysql.service;                                                          \
-			fi;                                                                                         \
-			sed -re "s/database_name_here/$(NAME)/g" -i $(PATH_PWD)/wordpress.sql;                      \
-			sed -re "s/username_here/$(USER)/g" -i  $(PATH_PWD)/wordpress.sql;                          \
-			sed -re "s/password_here/$(PASSWORD)/g" -i  $(PATH_PWD)/wordpress.sql;                      \
-			cat wordpress.sql | sudo mysql --defaults-extra-file=/etc/mysql/debian.cnf;                 \
-			wget http://wordpress.org/latest.tar.gz;                                                    \
-			tar -xf latest.tar.gz;                                                                      \
-			cp -R wordpress/* /var/www/html/$(HOST)/;                                                   \
-			rm -rf latest.tar.gz wordpress;                                                             \
-			cp /var/www/html/$(HOST)/wp-config-sample.php /var/www/html/$(HOST)/wp-config.php;          \
-			sed -re "s/database_name_here/$(NAME)/g" -i /var/www/html/$(HOST)/wp-config.php;            \
-			sed -re "s/username_here/$(USER)/g" -i /var/www/html/$(HOST)/wp-config.php;                 \
-			sed -re "s/password_here/$(PASSWORD)/g" -i /var/www/html/$(HOST)/wp-config.php;             \
-			echo "===== Done =====";                                                                    \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z "$(OS_ID)" ]; then                                                                      \
-			echo "Error: OS not supported";                                                             \
-		else                                                                                            \
-			echo "Error: $(OS_ID) OS not supported";                                                    \
+	@	if [ $$(id -u) -ne 0 ]; then                                                           \
+			echo "Error: Please run as root";                                                  \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ -z $(NAME) ]; then                                                                \
+			echo "Error: NAME arg is not set";                                                 \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ -z $(USER) ]; then                                                                \
+			echo "Error: USER arg is not set";                                                 \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ -z $(PASSWORD) ]; then                                                            \
+			echo "Error: PASSWORD arg is not set";                                             \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ -z $(HOST) ]; then                                                                \
+			echo "Error: DB_HOST arg is not set";                                              \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ ! -f /etc/apache2/sites-available/$(HOST).conf ]; then                            \
+			echo "Error: Site $(HOST) is not set";                                             \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                     \
+			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then      \
+				echo "===== Start mysql.service =====";                                        \
+				systemctl start mysql.service;                                                 \
+			fi;                                                                                \
+			sed -re "s/database_name_here/$(NAME)/g" -i $(PATH_PWD)/wordpress.sql;             \
+			sed -re "s/username_here/$(USER)/g" -i  $(PATH_PWD)/wordpress.sql;                 \
+			sed -re "s/password_here/$(PASSWORD)/g" -i  $(PATH_PWD)/wordpress.sql;             \
+			cat wordpress.sql | sudo mysql --defaults-extra-file=/etc/mysql/debian.cnf;        \
+			wget http://wordpress.org/latest.tar.gz;                                           \
+			tar -xf latest.tar.gz;                                                             \
+			cp -R wordpress/* /var/www/html/$(HOST)/;                                          \
+			rm -rf latest.tar.gz wordpress;                                                    \
+			cp /var/www/html/$(HOST)/wp-config-sample.php /var/www/html/$(HOST)/wp-config.php; \
+			sed -re "s/database_name_here/$(NAME)/g" -i /var/www/html/$(HOST)/wp-config.php;   \
+			sed -re "s/username_here/$(USER)/g" -i /var/www/html/$(HOST)/wp-config.php;        \
+			sed -re "s/password_here/$(PASSWORD)/g" -i /var/www/html/$(HOST)/wp-config.php;    \
+			echo "===== Done =====";                                                           \
+			exit;                                                                              \
+		fi;                                                                                    \
+		if [ -z "$(OS_ID)" ]; then                                                             \
+			echo "Error: OS not supported";                                                    \
+		else                                                                                   \
+			echo "Error: $(OS_ID) OS not supported";                                           \
 		fi;
 
 start:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                \
-			echo "Error: Please run as root";                                                       \
-			exit;                                                                                   \
-		fi;                                                                                         \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                          \
-			if [ -z "$$(systemctl status apache2.service | grep "Active: active ")" ]; then         \
-				echo "===== Start apache2.service =====";                                           \
-				systemctl start apache2.service;                                                    \
-			else                                                                                    \
-				echo "===== Restart apache2.service =====";                                         \
-				systemctl restart apache2.service;                                                  \
-			fi;                                                                                     \
-			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then           \
-				echo "===== Start mysql.service =====";                                             \
-				systemctl start mysql.service;                                                      \
-			else                                                                                    \
-				echo "===== Restart mysql.service =====";                                           \
-				systemctl restart mysql.service;                                                    \
-			fi;                                                                                     \
-			echo "===== Done =====";                                                                \
-			exit;                                                                                   \
-		fi;                                                                                         \
-		if [ -z "$(OS_ID)" ]; then                                                                  \
-			echo "Error: OS not supported";                                                         \
-		else                                                                                        \
-			echo "Error: $(OS_ID) OS not supported";                                                \
+	@	if [ $$(id -u) -ne 0 ]; then                                                        \
+			echo "Error: Please run as root";                                               \
+			exit;                                                                           \
+		fi;                                                                                 \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                  \
+			if [ -z "$$(systemctl status apache2.service | grep "Active: active ")" ]; then \
+				echo "===== Start apache2.service =====";                                   \
+				systemctl start apache2.service;                                            \
+			else                                                                            \
+				echo "===== Restart apache2.service =====";                                 \
+				systemctl restart apache2.service;                                          \
+			fi;                                                                             \
+			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then   \
+				echo "===== Start mysql.service =====";                                     \
+				systemctl start mysql.service;                                              \
+			else                                                                            \
+				echo "===== Restart mysql.service =====";                                   \
+				systemctl restart mysql.service;                                            \
+			fi;                                                                             \
+			echo "===== Done =====";                                                        \
+			exit;                                                                           \
+		fi;                                                                                 \
+		if [ -z "$(OS_ID)" ]; then                                                          \
+			echo "Error: OS not supported";                                                 \
+		else                                                                                \
+			echo "Error: $(OS_ID) OS not supported";                                        \
 		fi;
