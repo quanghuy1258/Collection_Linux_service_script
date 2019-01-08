@@ -211,10 +211,10 @@ configure_host:
 					fi;                                                                                 \
 				fi;                                                                                     \
 			done <$(PATH_PWD)/$(HOST)/$(HOST).conf;                                                     \
-			cp $(PATH_PWD)/$(HOST).pem /etc/ssl/certs/$(HOST).pem;                                      \
-			cp $(PATH_PWD)/$(HOST).key /etc/ssl/private/$(HOST).key;                                    \
-			if [ -f $(PATH_PWD)/$(CA).pem ]; then                                                       \
-				cp $(PATH_PWD)/$(CA).pem /etc/ssl/certs/$(CA).pem;                                      \
+			cp $(PATH_PWD)/$(HOST)/$(HOST).pem /etc/ssl/certs/$(HOST).pem;                              \
+			cp $(PATH_PWD)/$(HOST)/$(HOST).key /etc/ssl/private/$(HOST).key;                            \
+			if [ -f $(PATH_PWD)/$(HOST)/$(CA).pem ]; then                                               \
+				cp $(PATH_PWD)/$(HOST)/$(CA).pem /etc/ssl/certs/$(CA).pem;                              \
 			else                                                                                        \
 				if [ ! -f /etc/ssl/certs/$(CA).pem ]; then                                              \
 					echo "Error: File /etc/ssl/certs/$(CA).pem not found";                              \
