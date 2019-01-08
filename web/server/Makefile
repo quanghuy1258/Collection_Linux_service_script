@@ -73,56 +73,60 @@ uninstall:
 		fi;
 
 configure:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                                           \
-			echo "Error: Please run as root";                                                                                  \
-			exit;                                                                                                              \
-		fi;                                                                                                                    \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                     \
-			echo "===== Configure =====";                                                                                      \
-			echo "Info: Enable PHP in Apache2";                                                                                \
-			a2dismod php*;                                                                                                     \
-			a2dismod mpm_*;                                                                                                    \
-			a2enmod php*;                                                                                                      \
-			echo "Info: Allow only localhost in default site for testing";                                                     \
-			if [ -z "$$(cat /etc/apache2/sites-available/000-default.conf | grep " Configured: configure")" ]; then            \
-				if [ -f /etc/apache2/sites-available/000-default.conf ] && [ ! -f $(PATH_PWD)/000-default.conf.bak ]; then     \
-					cp /etc/apache2/sites-available/000-default.conf $(PATH_PWD)/000-default.conf.bak;                         \
-				fi;                                                                                                            \
-				rm /etc/apache2/sites-available/000-default.conf;                                                              \
-				touch /etc/apache2/sites-available/000-default.conf;                                                           \
-				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
-					printf "%s\n" "$$line" >>/etc/apache2/sites-available/000-default.conf;                                    \
-					if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAdmin webmaster@localhost")" ]; then                      \
-						printf "\tOrder deny,allow\n" >>/etc/apache2/sites-available/000-default.conf;                         \
-						printf "\tDeny from all\n" >>/etc/apache2/sites-available/000-default.conf;                            \
-						printf "\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/000-default.conf;   \
-					fi;                                                                                                        \
-				done <$(PATH_PWD)/000-default.conf.bak;                                                                        \
-				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/000-default.conf;                       \
-			fi;                                                                                                                \
-			if [ -z "$$(cat /etc/apache2/sites-available/default-ssl.conf | grep " Configured: configure")" ]; then            \
-				if [ -f /etc/apache2/sites-available/default-ssl.conf ] && [ ! -f $(PATH_PWD)/default-ssl.conf.bak ]; then     \
-					cp /etc/apache2/sites-available/default-ssl.conf $(PATH_PWD)/default-ssl.conf.bak;                         \
-				fi;                                                                                                            \
-				rm /etc/apache2/sites-available/default-ssl.conf;                                                              \
-				touch /etc/apache2/sites-available/default-ssl.conf;                                                           \
-				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
-					printf "%s\n" "$$line" >>/etc/apache2/sites-available/default-ssl.conf;                                    \
-					if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAdmin webmaster@localhost")" ]; then                      \
-						printf "\t\tOrder deny,allow\n" >>/etc/apache2/sites-available/default-ssl.conf;                       \
-						printf "\t\tDeny from all\n" >>/etc/apache2/sites-available/default-ssl.conf;                          \
-						printf "\t\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/default-ssl.conf; \
-					fi;                                                                                                        \
-				done <$(PATH_PWD)/default-ssl.conf.bak;                                                                        \
-				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/default-ssl.conf;                       \
-			fi;                                                                                                                \
-			echo "===== Done =====";                                                                                           \
-			exit;                                                                                                              \
-		fi;                                                                                                                    \
-		if [ -z "$(OS_ID)" ]; then                                                                                             \
-			echo "Error: OS not supported";                                                                                    \
-		else                                                                                                                   \
-			echo "Error: $(OS_ID) OS not supported";                                                                           \
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                             \
+			echo "Error: Please run as root";                                                                                    \
+			exit;                                                                                                                \
+		fi;                                                                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                       \
+			echo "===== Configure =====";                                                                                        \
+			echo "Info: Enable PHP in Apache2";                                                                                  \
+			a2dismod php*;                                                                                                       \
+			a2dismod mpm_*;                                                                                                      \
+			a2enmod php*;                                                                                                        \
+			echo "Info: Allow only localhost in default site for testing";                                                       \
+			if [ -z "$$(cat /etc/apache2/sites-available/000-default.conf | grep " Configured: configure")" ]; then              \
+				if [ -f /etc/apache2/sites-available/000-default.conf ] && [ ! -f $(PATH_PWD)/000-default.conf.bak ]; then       \
+					cp /etc/apache2/sites-available/000-default.conf $(PATH_PWD)/000-default.conf.bak;                           \
+				fi;                                                                                                              \
+				rm /etc/apache2/sites-available/000-default.conf;                                                                \
+				touch /etc/apache2/sites-available/000-default.conf;                                                             \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                               \
+					printf "%s\n" "$$line" >>/etc/apache2/sites-available/000-default.conf;                                      \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "DocumentRoot /var/www/html")" ]; then                             \
+						printf "\t<Directory /var/www/html>\n" >>/etc/apache2/sites-available/000-default.conf;                  \
+						printf "\t\tOrder deny,allow\n" >>/etc/apache2/sites-available/000-default.conf;                         \
+						printf "\t\tDeny from all\n" >>/etc/apache2/sites-available/000-default.conf;                            \
+						printf "\t\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/000-default.conf;   \
+						printf "\t</Directory>\n" >>/etc/apache2/sites-available/000-default.conf;                               \
+					fi;                                                                                                          \
+				done <$(PATH_PWD)/000-default.conf.bak;                                                                          \
+				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/000-default.conf;                         \
+			fi;                                                                                                                  \
+			if [ -z "$$(cat /etc/apache2/sites-available/default-ssl.conf | grep " Configured: configure")" ]; then              \
+				if [ -f /etc/apache2/sites-available/default-ssl.conf ] && [ ! -f $(PATH_PWD)/default-ssl.conf.bak ]; then       \
+					cp /etc/apache2/sites-available/default-ssl.conf $(PATH_PWD)/default-ssl.conf.bak;                           \
+				fi;                                                                                                              \
+				rm /etc/apache2/sites-available/default-ssl.conf;                                                                \
+				touch /etc/apache2/sites-available/default-ssl.conf;                                                             \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                               \
+					printf "%s\n" "$$line" >>/etc/apache2/sites-available/default-ssl.conf;                                      \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "DocumentRoot /var/www/html")" ]; then                             \
+						printf "\t\t<Directory /var/www/html>\n" >>/etc/apache2/sites-available/000-default.conf;                \
+						printf "\t\t\tOrder deny,allow\n" >>/etc/apache2/sites-available/default-ssl.conf;                       \
+						printf "\t\t\tDeny from all\n" >>/etc/apache2/sites-available/default-ssl.conf;                          \
+						printf "\t\t\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/default-ssl.conf; \
+						printf "\t\t</Directory>\n" >>/etc/apache2/sites-available/000-default.conf;                             \
+					fi;                                                                                                          \
+				done <$(PATH_PWD)/default-ssl.conf.bak;                                                                          \
+				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/default-ssl.conf;                         \
+			fi;                                                                                                                  \
+			echo "===== Done =====";                                                                                             \
+			exit;                                                                                                                \
+		fi;                                                                                                                      \
+		if [ -z "$(OS_ID)" ]; then                                                                                               \
+			echo "Error: OS not supported";                                                                                      \
+		else                                                                                                                     \
+			echo "Error: $(OS_ID) OS not supported";                                                                             \
 		fi;
 
 start:
