@@ -7,11 +7,11 @@ help:
 	@	echo "- Install dependencies:     (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:       $$ sudo make uninstall"
 	@	echo "- Configure postfix:        (2) $$ sudo make configure_postfix"
-	@	echo "- Configure squirrelmail:   (3) $$ sudo make configure_squirrelmail"
-	@	echo "- Configure mail filtering: (4) $$ sudo make configure_filtering"
-	@	echo "- Configure SSL:            (5) $$ sudo make configure_ssl MYHOSTNAME={string}"
-	@	echo "- Start service:            (6) $$ sudo make start"
-	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5) -> (6)"
+	@	echo "- Configure mail filtering: (3) $$ sudo make configure_filtering"
+	@	echo "- Configure SSL:            (4) $$ sudo make configure_ssl MYHOSTNAME={string}"
+	@	echo "- Start service:            (5) $$ sudo make start"
+	@	echo "- For only squirrelmail:        $$ sudo make squirrelmail CMD={string}"
+	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5)"
 
 install:
 	@	if [ $$(id -u) -ne 0 ]; then                                            \
@@ -35,7 +35,6 @@ install:
 				echo "===== Install dovecot-pop3d =====";                       \
 				apt-get -y install dovecot-pop3d;                               \
 			fi;                                                                 \
-			$(PATH_PWD)/squirrelmail/install.sh || exit;                        \
 			if [ -z "$$(apt list --installed | grep "^amavisd-new/")" ]; then   \
 				echo "===== Install amavisd-new =====";                         \
 				apt-get -y install amavisd-new;                                 \
@@ -99,7 +98,6 @@ uninstall:
 				echo "===== Uninstall dovecot-pop3d =====";                                         \
 				apt-get -y purge dovecot-pop3d;                                                     \
 			fi;                                                                                     \
-			$(PATH_PWD)/squirrelmail/uninstall.sh || exit;                                          \
 			if [ ! -z "$$(apt list --installed | grep "^amavisd-new/")" ]; then                     \
 				echo "===== Uninstall amavisd-new =====";                                           \
 				apt-get -y purge amavisd-new;                                                       \
@@ -140,22 +138,6 @@ configure_postfix:
 			echo "Error: OS not supported";          \
 		else                                         \
 			echo "Error: $(OS_ID) OS not supported"; \
-		fi;
-
-configure_squirrelmail:
-	@	if [ $$(id -u) -ne 0 ]; then                       \
-			echo "Error: Please run as root";              \
-			exit;                                          \
-		fi;                                                \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                 \
-			$(PATH_PWD)/squirrelmail/configure.sh || exit; \
-			echo "===== Done =====";                       \
-			exit;                                          \
-		fi;                                                \
-		if [ -z "$(OS_ID)" ]; then                         \
-			echo "Error: OS not supported";                \
-		else                                               \
-			echo "Error: $(OS_ID) OS not supported";       \
 		fi;
 
 # Explanation of read line: https://stackoverflow.com/a/10929511
@@ -365,7 +347,6 @@ start:
 				echo "===== Restart dovecot.service =====";                                       \
 				systemctl restart dovecot.service;                                                \
 			fi;                                                                                   \
-			$(PATH_PWD)/squirrelmail/start.sh || exit;                                            \
 			echo "===== Done =====";                                                              \
 			exit;                                                                                 \
 		fi;                                                                                       \
@@ -373,4 +354,35 @@ start:
 			echo "Error: OS not supported";                                                       \
 		else                                                                                      \
 			echo "Error: $(OS_ID) OS not supported";                                              \
+		fi;
+
+squirrelmail:
+	@	if [ $$(id -u) -ne 0 ]; then                                                     \
+			echo "Error: Please run as root";                                            \
+			exit;                                                                        \
+		fi;                                                                              \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                               \
+			if [ "$(CMD)" = "install" ]; then                                            \
+				$(PATH_PWD)/squirrelmail/install.sh || exit;                             \
+				echo "===== Done =====";                                                 \
+			fi;                                                                          \
+			if [ "$(CMD)" = "uninstall" ]; then                                          \
+				$(PATH_PWD)/squirrelmail/uninstall.sh || exit;                           \
+				echo "===== Done =====";                                                 \
+			fi;                                                                          \
+			if [ "$(CMD)" = "configure" ]; then                                          \
+				$(PATH_PWD)/squirrelmail/configure.sh || exit;                           \
+				echo "===== Done =====";                                                 \
+			fi;                                                                          \
+			if [ "$(CMD)" = "start" ]; then                                              \
+				$(PATH_PWD)/squirrelmail/start.sh || exit;                               \
+				echo "===== Done =====";                                                 \
+			fi;                                                                          \
+			echo "Error: CMD arg must be one of {install, uninstall, configure, start}"; \
+			exit;                                                                        \
+		fi;                                                                              \
+		if [ -z "$(OS_ID)" ]; then                                                       \
+			echo "Error: OS not supported";                                              \
+		else                                                                             \
+			echo "Error: $(OS_ID) OS not supported";                                     \
 		fi;
