@@ -365,18 +365,22 @@ only_squirrelmail:
 			if [ "$(CMD)" = "install" ]; then                                            \
 				$(PATH_PWD)/squirrelmail/install.sh || exit;                             \
 				echo "===== Done =====";                                                 \
+				exit;                                                                    \
 			fi;                                                                          \
 			if [ "$(CMD)" = "uninstall" ]; then                                          \
 				$(PATH_PWD)/squirrelmail/uninstall.sh || exit;                           \
 				echo "===== Done =====";                                                 \
+				exit;                                                                    \
 			fi;                                                                          \
 			if [ "$(CMD)" = "configure" ]; then                                          \
 				$(PATH_PWD)/squirrelmail/configure.sh || exit;                           \
 				echo "===== Done =====";                                                 \
+				exit;                                                                    \
 			fi;                                                                          \
 			if [ "$(CMD)" = "start" ]; then                                              \
 				$(PATH_PWD)/squirrelmail/start.sh || exit;                               \
 				echo "===== Done =====";                                                 \
+				exit;                                                                    \
 			fi;                                                                          \
 			echo "Error: CMD arg must be one of {install, uninstall, configure, start}"; \
 			exit;                                                                        \
