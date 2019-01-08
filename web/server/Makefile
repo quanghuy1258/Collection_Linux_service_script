@@ -7,7 +7,6 @@ help:
 	@	echo "- Install dependencies:     (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:       $$ sudo make uninstall"
 	@	echo "- Configure general:        (2) $$ sudo make configure"
-	@	echo "- Configure virtual host:       $$ sudo make configure_host NAME_OF_YOUR_VIRTUAL_HOST={string} DB_PASSWORD={string}"
 	@	echo "- Start:                    (3) $$ sudo make start"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
@@ -28,10 +27,6 @@ install:
 			if [ -z "$$(apt list --installed | grep "^php/")" ]; then                                     \
 				echo "===== Install php =====";                                                           \
 				sudo apt-get -y install php libapache2-mod-php php-cli php-cgi php-mysql;                 \
-			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep "^wordpress/")" ]; then                               \
-				echo "===== Install wordpress =====";                                                     \
-				sudo apt-get -y install wordpress;                                                        \
 			fi;                                                                                           \
 			echo "===== Done =====";                                                                      \
 			exit;                                                                                         \
@@ -68,10 +63,6 @@ uninstall:
 				echo "===== Uninstall php =====";                                                   \
 				apt-get -y purge php libapache2-mod-php php-cli php-cgi php-mysql;                  \
 			fi;                                                                                     \
-			if [ ! -z "$$(apt list --installed | grep "^wordpress/")" ]; then                       \
-				echo "===== Uninstall wordpress =====";                                             \
-				apt-get -y purge wordpress;                                                         \
-			fi;                                                                                     \
 			echo "===== Done =====";                                                                \
 			exit;                                                                                   \
 		fi;                                                                                         \
@@ -82,71 +73,56 @@ uninstall:
 		fi;
 
 configure:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                     \
-			echo "Error: Please run as root";                                                            \
-			exit;                                                                                        \
-		fi;                                                                                              \
-		if [ ! -f $(PATH_PWD)/wordpress/wordpress.conf ]; then                                           \
-			echo "Error: File wordpress/wordpress.conf not found";                                       \
-			exit;                                                                                        \
-		fi;                                                                                              \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                               \
-			echo "===== Configure =====";                                                                \
-			echo "Info: Enable PHP in Apache2";                                                          \
-			a2dismod mpm_*;                                                                              \
-			a2enmod php*;                                                                                \
-			echo "Info: Configure wordpress";                                                            \
-			cp $(PATH_PWD)/wordpress/wordpress.conf /etc/apache2/sites-available/wordpress.conf;         \
-			a2ensite wordpress;                                                                          \
-			echo "===== Done =====";                                                                     \
-			exit;                                                                                        \
-		fi;                                                                                              \
-		if [ -z "$(OS_ID)" ]; then                                                                       \
-			echo "Error: OS not supported";                                                              \
-		else                                                                                             \
-			echo "Error: $(OS_ID) OS not supported";                                                     \
-		fi;
-
-configure_host:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                              \
-			echo "Error: Please run as root";                                                                     \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ -z $(NAME_OF_YOUR_VIRTUAL_HOST) ]; then                                                              \
-			echo "Error: NAME_OF_YOUR_VIRTUAL_HOST arg is not set";                                               \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ -z $(DB_PASSWORD) ]; then                                                                            \
-			echo "Error: DB_PASSWORD arg is not set";                                                             \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ ! -f $(PATH_PWD)/wordpress/config-localhost.php ]; then                                              \
-			echo "Error: File wordpress/config-localhost.php not found";                                          \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ ! -f $(PATH_PWD)/wordpress/wordpress.sql ]; then                                                     \
-			echo "Error: File wordpress/wordpress.sql not found";                                                 \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                        \
-			echo "===== Configure host =====";                                                                    \
-			sed -re "s/yourpasswordhere/$(DB_PASSWORD)/g" -i $(PATH_PWD)/wordpress/config-localhost.php;          \
-			sed -re "s/yourpasswordhere/$(DB_PASSWORD)/g" -i $(PATH_PWD)/wordpress/wordpress.sql;                 \
-			sed -re "s/localhost/$(NAME_OF_YOUR_VIRTUAL_HOST)/g" -i $(PATH_PWD)/wordpress/config-localhost.php;   \
-			sed -re "s/localhost/$(NAME_OF_YOUR_VIRTUAL_HOST)/g" -i $(PATH_PWD)/wordpress/wordpress.sql;          \
-			cp $(PATH_PWD)/wordpress/config-localhost.php /etc/wordpress/config-$(NAME_OF_YOUR_VIRTUAL_HOST).php; \
-			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then                         \
-				echo "===== Start mysql.service =====";                                                           \
-				systemctl start mysql.service;                                                                    \
-			fi;                                                                                                   \
-			cat $(PATH_PWD)/wordpress/wordpress.sql | mysql --defaults-extra-file=/etc/mysql/debian.cnf;          \
-			echo "===== Done =====";                                                                              \
-			exit;                                                                                                 \
-		fi;                                                                                                       \
-		if [ -z "$(OS_ID)" ]; then                                                                                \
-			echo "Error: OS not supported";                                                                       \
-		else                                                                                                      \
-			echo "Error: $(OS_ID) OS not supported";                                                              \
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                           \
+			echo "Error: Please run as root";                                                                                  \
+			exit;                                                                                                              \
+		fi;                                                                                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                     \
+			echo "===== Configure =====";                                                                                      \
+			echo "Info: Enable PHP in Apache2";                                                                                \
+			a2dismod php*;                                                                                                     \
+			a2dismod mpm_*;                                                                                                    \
+			a2enmod php*;                                                                                                      \
+			echo "Info: Allow only localhost in default site for testing";                                                     \
+			if [ -z "$$(cat /etc/apache2/sites-available/000-default.conf | grep " Configured: configure")" ]; then            \
+				if [ -f /etc/apache2/sites-available/000-default.conf ] && [ ! -f $(PATH_PWD)/000-default.conf.bak ]; then     \
+					cp /etc/apache2/sites-available/000-default.conf $(PATH_PWD)/000-default.conf.bak;                         \
+				fi;                                                                                                            \
+				rm /etc/apache2/sites-available/000-default.conf;                                                              \
+				touch /etc/apache2/sites-available/000-default.conf;                                                           \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
+					printf "%s\n" "$$line" >>/etc/apache2/sites-available/000-default.conf;                                    \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAdmin webmaster@localhost")" ]; then                      \
+						printf "\tOrder deny,allow\n" >>/etc/apache2/sites-available/000-default.conf;                         \
+						printf "\tDeny from all\n" >>/etc/apache2/sites-available/000-default.conf;                            \
+						printf "\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/000-default.conf;   \
+					fi;                                                                                                        \
+				done <$(PATH_PWD)/000-default.conf.bak;                                                                        \
+				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/000-default.conf;                       \
+			fi;                                                                                                                \
+			if [ -z "$$(cat /etc/apache2/sites-available/default-ssl.conf | grep " Configured: configure")" ]; then            \
+				if [ -f /etc/apache2/sites-available/default-ssl.conf ] && [ ! -f $(PATH_PWD)/default-ssl.conf.bak ]; then     \
+					cp /etc/apache2/sites-available/default-ssl.conf $(PATH_PWD)/default-ssl.conf.bak;                         \
+				fi;                                                                                                            \
+				rm /etc/apache2/sites-available/default-ssl.conf;                                                              \
+				touch /etc/apache2/sites-available/default-ssl.conf;                                                           \
+				while IFS='' read -r line || [[ -n "$$line" ]]; do                                                             \
+					printf "%s\n" "$$line" >>/etc/apache2/sites-available/default-ssl.conf;                                    \
+					if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAdmin webmaster@localhost")" ]; then                      \
+						printf "\t\tOrder deny,allow\n" >>/etc/apache2/sites-available/default-ssl.conf;                       \
+						printf "\t\tDeny from all\n" >>/etc/apache2/sites-available/default-ssl.conf;                          \
+						printf "\t\tAllow from 127.0.0.0/255.0.0.0 ::1/128\n" >>/etc/apache2/sites-available/default-ssl.conf; \
+					fi;                                                                                                        \
+				done <$(PATH_PWD)/default-ssl.conf.bak;                                                                        \
+				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/default-ssl.conf;                       \
+			fi;                                                                                                                \
+			echo "===== Done =====";                                                                                           \
+			exit;                                                                                                              \
+		fi;                                                                                                                    \
+		if [ -z "$(OS_ID)" ]; then                                                                                             \
+			echo "Error: OS not supported";                                                                                    \
+		else                                                                                                                   \
+			echo "Error: $(OS_ID) OS not supported";                                                                           \
 		fi;
 
 start:
