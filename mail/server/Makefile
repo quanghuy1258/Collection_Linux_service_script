@@ -10,7 +10,7 @@ help:
 	@	echo "- Configure mail filtering: (3) $$ sudo make configure_filtering"
 	@	echo "- Configure SSL:            (4) $$ sudo make configure_ssl MYHOSTNAME={string}"
 	@	echo "- Start service:            (5) $$ sudo make start"
-	@	echo "- For only squirrelmail:        $$ sudo make squirrelmail CMD={string}"
+	@	echo "- For only squirrelmail:        $$ sudo make only_squirrelmail CMD={string}"
 	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5)"
 
 install:
@@ -356,7 +356,7 @@ start:
 			echo "Error: $(OS_ID) OS not supported";                                              \
 		fi;
 
-squirrelmail:
+only_squirrelmail:
 	@	if [ $$(id -u) -ne 0 ]; then                                                     \
 			echo "Error: Please run as root";                                            \
 			exit;                                                                        \
