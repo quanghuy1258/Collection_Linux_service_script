@@ -34,6 +34,10 @@ install:
 				echo "===== Install openssl =====";                                       \
 				sudo apt-get -y install openssl;                                          \
 			fi;                                                                           \
+			if [ -z "$$(apt list --installed | grep "^libnss3-tools/")" ]; then           \
+				echo "===== Install libnss3-tools =====";                                 \
+				sudo apt-get -y install libnss3-tools;                                    \
+			fi;                                                                           \
 			echo "===== Done =====";                                                      \
 			exit;                                                                         \
 		fi;                                                                               \
@@ -219,6 +223,7 @@ configure_host:
 					fi;                                                                                 \
 				fi;                                                                                     \
 			done <$(PATH_PWD)/$(HOST)/$(HOST).conf;                                                     \
+			echo "Info: Configure ssl";                                                                 \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).pem /etc/ssl/certs/$(HOST).pem;                              \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).key /etc/ssl/private/$(HOST).key;                            \
 			if [ -f $(PATH_PWD)/$(HOST)/$(CA).pem ]; then                                               \
@@ -232,6 +237,11 @@ configure_host:
 			hash=$$(openssl x509 -noout -hash -in /etc/ssl/certs/$(CA).pem);                            \
 			rm -rf /etc/ssl/certs/$$hash.0;                                                             \
 			ln -s /etc/ssl/certs/cacert.pem /etc/ssl/certs/$$hash.0;                                    \
+			for certDB in $$(find /home /root -name "cert9.db"); do                                     \
+				certDir=$$(dirname $$certDB);                                                           \
+				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
+			done;                                                                                       \
+			echo "Info: Configure apache2";                                                             \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).conf /etc/apache2/sites-available/;                          \
 			a2ensite $(HOST);                                                                           \
 			mkdir -p /var/www/html/$(HOST);                                                             \
