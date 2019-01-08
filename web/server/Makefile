@@ -347,6 +347,10 @@ fix_https:
 			exit;                                                                                       \
 		fi;                                                                                             \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
+			for certDB in $$(find /home /root -name "cert8.db"); do                                     \
+				certDir=$$(dirname $$certDB);                                                           \
+				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
+			done;                                                                                       \
 			for certDB in $$(find /home /root -name "cert9.db"); do                                     \
 				certDir=$$(dirname $$certDB);                                                           \
 				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
