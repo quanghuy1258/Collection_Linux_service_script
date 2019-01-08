@@ -10,7 +10,8 @@ help:
 	@	echo "- Configure virtual host:       $$ sudo make configure_host ADMIN={string} CA={string} DOMAIN={string} HOST={string}"
 	@	echo "- Configure wordpress:          $$ sudo make configure_wordpress NAME={string} USER={string} PASSWORD={string} HOST={string}"
 	@	echo "- Start:                    (3) $$ sudo make start"
-	@	echo "RECOMMEND: (1) -> (2) -> (3)"
+	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string}"
+	@	echo "RECOMMEND: (1) -> (2) -> (3) [-> (4)]"
 
 install:
 	@	if [ $$(id -u) -ne 0 ]; then                                                      \
@@ -237,10 +238,6 @@ configure_host:
 			hash=$$(openssl x509 -noout -hash -in /etc/ssl/certs/$(CA).pem);                            \
 			rm -rf /etc/ssl/certs/$$hash.0;                                                             \
 			ln -s /etc/ssl/certs/cacert.pem /etc/ssl/certs/$$hash.0;                                    \
-			for certDB in $$(find /home /root -name "cert9.db"); do                                     \
-				certDir=$$(dirname $$certDB);                                                           \
-				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
-			done;                                                                                       \
 			echo "Info: Configure apache2";                                                             \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).conf /etc/apache2/sites-available/;                          \
 			a2ensite $(HOST);                                                                           \
@@ -334,4 +331,31 @@ start:
 			echo "Error: OS not supported";                                                 \
 		else                                                                                \
 			echo "Error: $(OS_ID) OS not supported";                                        \
+		fi;
+
+fix_https:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                    \
+			echo "Error: Please run as root";                                                           \
+			exit;                                                                                       \
+		fi;                                                                                             \
+		if [ -z $(CA) ]; then                                                                           \
+			echo "Error: CA arg is not set";                                                            \
+			exit;                                                                                       \
+		fi;                                                                                             \
+		if [ ! -f /etc/ssl/certs/$(CA).pem ]; then                                                      \
+			echo "Error: File /etc/ssl/certs/$(CA).pem not found";                                      \
+			exit;                                                                                       \
+		fi;                                                                                             \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
+			for certDB in $$(find /home /root -name "cert9.db"); do                                     \
+				certDir=$$(dirname $$certDB);                                                           \
+				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
+			done;                                                                                       \
+			echo "===== Done =====";                                                                    \
+			exit;                                                                                       \
+		fi;                                                                                             \
+		if [ -z "$(OS_ID)" ]; then                                                                      \
+			echo "Error: OS not supported";                                                             \
+		else                                                                                            \
+			echo "Error: $(OS_ID) OS not supported";                                                    \
 		fi;
