@@ -126,6 +126,8 @@ configure:
 				done <$(PATH_PWD)/default-ssl.conf.bak;                                                                          \
 				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/default-ssl.conf;                         \
 			fi;                                                                                                                  \
+			echo "Info: Enable SSL in Apache2";                                                                                  \
+			a2enmod ssl;                                                                                                         \
 			echo "===== Done =====";                                                                                             \
 			exit;                                                                                                                \
 		fi;                                                                                                                      \
@@ -183,6 +185,12 @@ configure_host:
 				if [ ! -z "$$(printf "%s" "$$line" | grep "DocumentRoot ")" ]; then                     \
 					if [ -z "$$(printf "%s" "$$line" | grep " /var/www/html/$(HOST)$$")" ]; then        \
 						echo "Error: DocumentRoot -> Wrong";                                            \
+						exit;                                                                           \
+					fi;                                                                                 \
+				fi;                                                                                     \
+				if [ ! -z "$$(printf "%s" "$$line" | grep "Redirect permanent / ")" ]; then             \
+					if [ -z "$$(printf "%s" "$$line" | grep " https://$(HOST)/$$")" ]; then             \
+						echo "Error: Redirect permanent -> Wrong";                                      \
 						exit;                                                                           \
 					fi;                                                                                 \
 				fi;                                                                                     \
