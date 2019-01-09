@@ -356,7 +356,7 @@ fix_https:
 				sudo apt-get -y install libnss3-tools;                                           \
 			fi;                                                                                  \
 			hash=$$(openssl x509 -noout -hash -in $(CAPATH) 2>/dev/null);                        \
-			if [ -z "$$hash"]; then                                                              \
+			if [ -z "$$hash" ]; then                                                             \
 				echo "Error: File $(CAPATH) is not a certificate";                               \
 				exit;                                                                            \
 			fi;                                                                                  \
