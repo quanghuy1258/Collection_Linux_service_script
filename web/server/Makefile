@@ -10,7 +10,7 @@ help:
 	@	echo "- Configure virtual host:       $$ sudo make configure_host ADMIN={string} CA={string} DOMAIN={string} HOST={string}"
 	@	echo "- Configure wordpress:          $$ sudo make configure_wordpress NAME={string} USER={string} PASSWORD={string} HOST={string}"
 	@	echo "- Start:                    (3) $$ sudo make start"
-	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string} PATH={string}"
+	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string} CAPATH={string}"
 	@	echo "RECOMMEND: (1) -> (2) -> (3) [-> (4)]"
 
 install:
@@ -338,12 +338,12 @@ fix_https:
 			echo "Error: CA arg is not set";                                                     \
 			exit;                                                                                \
 		fi;                                                                                      \
-		if [ -z $(PATH) ]; then                                                                  \
+		if [ -z $(CAPATH) ]; then                                                                \
 			echo "Error: PATH arg is not set";                                                   \
 			exit;                                                                                \
 		fi;                                                                                      \
-		if [ ! -f $(PATH) ]; then                                                                \
-			echo "Error: File $(PATH) not found";                                                \
+		if [ ! -f $(CAPATH) ]; then                                                              \
+			echo "Error: File $(CAPATH) not found";                                              \
 			exit;                                                                                \
 		fi;                                                                                      \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                       \
@@ -355,12 +355,12 @@ fix_https:
 				echo "===== Install libnss3-tools =====";                                        \
 				sudo apt-get -y install libnss3-tools;                                           \
 			fi;                                                                                  \
-			hash=$$(openssl x509 -noout -hash -in $(PATH) 2>/dev/null);                          \
+			hash=$$(openssl x509 -noout -hash -in $(CAPATH) 2>/dev/null);                        \
 			if [ -z "$$hash"]; then                                                              \
-				echo "Error: File $(PATH) is not a certificate";                                 \
+				echo "Error: File $(CAPATH) is not a certificate";                               \
 				exit;                                                                            \
 			fi;                                                                                  \
-			cp $(PATH) /etc/ssl/certs/$(CA).pem;                                                 \
+			cp $(CAPATH) /etc/ssl/certs/$(CA).pem;                                               \
 			rm -rf /etc/ssl/certs/$$hash.0;                                                      \
 			ln -s /etc/ssl/certs/$(CA).pem /etc/ssl/certs/$$hash.0;                              \
 			for certDB in $$(find /home /root -name "cert8.db"); do                              \
