@@ -10,7 +10,7 @@ help:
 	@	echo "- Configure virtual host:       $$ sudo make configure_host ADMIN={string} CA={string} DOMAIN={string} HOST={string}"
 	@	echo "- Configure wordpress:          $$ sudo make configure_wordpress NAME={string} USER={string} PASSWORD={string} HOST={string}"
 	@	echo "- Start:                    (3) $$ sudo make start"
-	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string}"
+	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string} PATH={string}"
 	@	echo "RECOMMEND: (1) -> (2) -> (3) [-> (4)]"
 
 install:
@@ -34,10 +34,6 @@ install:
 			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                 \
 				echo "===== Install openssl =====";                                       \
 				sudo apt-get -y install openssl;                                          \
-			fi;                                                                           \
-			if [ -z "$$(apt list --installed | grep "^libnss3-tools/")" ]; then           \
-				echo "===== Install libnss3-tools =====";                                 \
-				sudo apt-get -y install libnss3-tools;                                    \
 			fi;                                                                           \
 			echo "===== Done =====";                                                      \
 			exit;                                                                         \
@@ -237,7 +233,7 @@ configure_host:
 			fi;                                                                                         \
 			hash=$$(openssl x509 -noout -hash -in /etc/ssl/certs/$(CA).pem);                            \
 			rm -rf /etc/ssl/certs/$$hash.0;                                                             \
-			ln -s /etc/ssl/certs/cacert.pem /etc/ssl/certs/$$hash.0;                                    \
+			ln -s /etc/ssl/certs/$(CA).pem /etc/ssl/certs/$$hash.0;                                     \
 			echo "Info: Configure apache2";                                                             \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).conf /etc/apache2/sites-available/;                          \
 			a2ensite $(HOST);                                                                           \
@@ -334,32 +330,52 @@ start:
 		fi;
 
 fix_https:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                    \
-			echo "Error: Please run as root";                                                           \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(CA) ]; then                                                                           \
-			echo "Error: CA arg is not set";                                                            \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ ! -f /etc/ssl/certs/$(CA).pem ]; then                                                      \
-			echo "Error: File /etc/ssl/certs/$(CA).pem not found";                                      \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
-			for certDB in $$(find /home /root -name "cert8.db"); do                                     \
-				certDir=$$(dirname $$certDB);                                                           \
-				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
-			done;                                                                                       \
-			for certDB in $$(find /home /root -name "cert9.db"); do                                     \
-				certDir=$$(dirname $$certDB);                                                           \
-				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir;        \
-			done;                                                                                       \
-			echo "===== Done =====";                                                                    \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z "$(OS_ID)" ]; then                                                                      \
-			echo "Error: OS not supported";                                                             \
-		else                                                                                            \
-			echo "Error: $(OS_ID) OS not supported";                                                    \
+	@	if [ $$(id -u) -ne 0 ]; then                                                             \
+			echo "Error: Please run as root";                                                    \
+			exit;                                                                                \
+		fi;                                                                                      \
+		if [ -z $(CA) ]; then                                                                    \
+			echo "Error: CA arg is not set";                                                     \
+			exit;                                                                                \
+		fi;                                                                                      \
+		if [ -z $(PATH) ]; then                                                                  \
+			echo "Error: PATH arg is not set";                                                   \
+			exit;                                                                                \
+		fi;                                                                                      \
+		if [ ! -f $(PATH) ]; then                                                                \
+			echo "Error: File $(PATH) not found";                                                \
+			exit;                                                                                \
+		fi;                                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                       \
+			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                        \
+				echo "===== Install openssl =====";                                              \
+				sudo apt-get -y install openssl;                                                 \
+			fi;                                                                                  \
+			if [ -z "$$(apt list --installed | grep "^libnss3-tools/")" ]; then                  \
+				echo "===== Install libnss3-tools =====";                                        \
+				sudo apt-get -y install libnss3-tools;                                           \
+			fi;                                                                                  \
+			hash=$$(openssl x509 -noout -hash -in $(PATH) 2>/dev/null);                          \
+			if [ -z "$$hash"]; then                                                              \
+				echo "Error: File $(PATH) is not a certificate";                                 \
+				exit;                                                                            \
+			fi;                                                                                  \
+			cp $(PATH) /etc/ssl/certs/$(CA).pem;                                                 \
+			rm -rf /etc/ssl/certs/$$hash.0;                                                      \
+			ln -s /etc/ssl/certs/$(CA).pem /etc/ssl/certs/$$hash.0;                              \
+			for certDB in $$(find /home /root -name "cert8.db"); do                              \
+				certDir=$$(dirname $$certDB);                                                    \
+				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir; \
+			done;                                                                                \
+			for certDB in $$(find /home /root -name "cert9.db"); do                              \
+				certDir=$$(dirname $$certDB);                                                    \
+				certutil -A -n "$(CA)" -t "TC,C,T" -i /etc/ssl/certs/$(CA).pem -d sql:$$certDir; \
+			done;                                                                                \
+			echo "===== Done =====";                                                             \
+			exit;                                                                                \
+		fi;                                                                                      \
+		if [ -z "$(OS_ID)" ]; then                                                               \
+			echo "Error: OS not supported";                                                      \
+		else                                                                                     \
+			echo "Error: $(OS_ID) OS not supported";                                             \
 		fi;
