@@ -250,54 +250,55 @@ configure_host:
 		fi;
 
 configure_wordpress:
-	@	if [ $$(id -u) -ne 0 ]; then                                                           \
-			echo "Error: Please run as root";                                                  \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ -z $(NAME) ]; then                                                                \
-			echo "Error: NAME arg is not set";                                                 \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ -z $(USER) ]; then                                                                \
-			echo "Error: USER arg is not set";                                                 \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ -z $(PASSWORD) ]; then                                                            \
-			echo "Error: PASSWORD arg is not set";                                             \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ -z $(HOST) ]; then                                                                \
-			echo "Error: DB_HOST arg is not set";                                              \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ ! -f /etc/apache2/sites-available/$(HOST).conf ]; then                            \
-			echo "Error: Site $(HOST) is not set";                                             \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                     \
-			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then      \
-				echo "===== Start mysql.service =====";                                        \
-				systemctl start mysql.service;                                                 \
-			fi;                                                                                \
-			sed -re "s/database_name_here/$(NAME)/g" -i $(PATH_PWD)/wordpress.sql;             \
-			sed -re "s/username_here/$(USER)/g" -i  $(PATH_PWD)/wordpress.sql;                 \
-			sed -re "s/password_here/$(PASSWORD)/g" -i  $(PATH_PWD)/wordpress.sql;             \
-			cat wordpress.sql | sudo mysql --defaults-extra-file=/etc/mysql/debian.cnf;        \
-			wget http://wordpress.org/latest.tar.gz;                                           \
-			tar -xf latest.tar.gz;                                                             \
-			cp -R wordpress/* /var/www/html/$(HOST)/;                                          \
-			rm -rf latest.tar.gz wordpress;                                                    \
-			cp /var/www/html/$(HOST)/wp-config-sample.php /var/www/html/$(HOST)/wp-config.php; \
-			sed -re "s/database_name_here/$(NAME)/g" -i /var/www/html/$(HOST)/wp-config.php;   \
-			sed -re "s/username_here/$(USER)/g" -i /var/www/html/$(HOST)/wp-config.php;        \
-			sed -re "s/password_here/$(PASSWORD)/g" -i /var/www/html/$(HOST)/wp-config.php;    \
-			echo "===== Done =====";                                                           \
-			exit;                                                                              \
-		fi;                                                                                    \
-		if [ -z "$(OS_ID)" ]; then                                                             \
-			echo "Error: OS not supported";                                                    \
-		else                                                                                   \
-			echo "Error: $(OS_ID) OS not supported";                                           \
+	@	if [ $$(id -u) -ne 0 ]; then                                                               \
+			echo "Error: Please run as root";                                                      \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ -z $(NAME) ]; then                                                                    \
+			echo "Error: NAME arg is not set";                                                     \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ -z $(USER) ]; then                                                                    \
+			echo "Error: USER arg is not set";                                                     \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ -z $(PASSWORD) ]; then                                                                \
+			echo "Error: PASSWORD arg is not set";                                                 \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ -z $(HOST) ]; then                                                                    \
+			echo "Error: DB_HOST arg is not set";                                                  \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ ! -f /etc/apache2/sites-available/$(HOST).conf ]; then                                \
+			echo "Error: Site $(HOST) is not set";                                                 \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                         \
+			if [ -z "$$(systemctl status mysql.service | grep "Active: active ")" ]; then          \
+				echo "===== Start mysql.service =====";                                            \
+				systemctl start mysql.service;                                                     \
+			fi;                                                                                    \
+			cp $(PATH_PWD)/wordpress.sql $(PATH_PWD)/$(HOST).sql;                                  \
+			sed -re "s/database_name_here/$(NAME)/g" -i $(PATH_PWD)/$(HOST).sql;                   \
+			sed -re "s/username_here/$(USER)/g" -i  $(PATH_PWD)/$(HOST).sql;                       \
+			sed -re "s/password_here/$(PASSWORD)/g" -i  $(PATH_PWD)/$(HOST).sql;                   \
+			cat  $(PATH_PWD)/$(HOST).sql | sudo mysql --defaults-extra-file=/etc/mysql/debian.cnf; \
+			wget http://wordpress.org/latest.tar.gz;                                               \
+			tar -xf latest.tar.gz;                                                                 \
+			cp -R wordpress/* /var/www/html/$(HOST)/;                                              \
+			rm -rf latest.tar.gz wordpress;                                                        \
+			cp /var/www/html/$(HOST)/wp-config-sample.php /var/www/html/$(HOST)/wp-config.php;     \
+			sed -re "s/database_name_here/$(NAME)/g" -i /var/www/html/$(HOST)/wp-config.php;       \
+			sed -re "s/username_here/$(USER)/g" -i /var/www/html/$(HOST)/wp-config.php;            \
+			sed -re "s/password_here/$(PASSWORD)/g" -i /var/www/html/$(HOST)/wp-config.php;        \
+			echo "===== Done =====";                                                               \
+			exit;                                                                                  \
+		fi;                                                                                        \
+		if [ -z "$(OS_ID)" ]; then                                                                 \
+			echo "Error: OS not supported";                                                        \
+		else                                                                                       \
+			echo "Error: $(OS_ID) OS not supported";                                               \
 		fi;
 
 start:
