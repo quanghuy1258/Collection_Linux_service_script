@@ -18,7 +18,7 @@ cd dhcp/server/;
 mv 192.168.231.2.dhcpd.conf dhcpd.conf;
 make install;
 make configure;
-make iface_ip IFACE=$IFACE IP=192.168.231.2;
+make iface_ip IFACE=$IFACE IP=192.168.231.2/24;
 make start;
 rm -rf dhcpd.conf;
 cd ../../;
