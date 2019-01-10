@@ -7,7 +7,7 @@ help:
 	@	echo "- Install dependencies:     (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:       $$ sudo make uninstall"
 	@	echo "- Configure general:        (2) $$ sudo make configure"
-	@	echo "- Configure virtual host:       $$ sudo make configure_host ADMIN={string} CA={string} DOMAIN={string} HOST={string}"
+	@	echo "- Configure virtual host:       $$ sudo make configure_host CA={string} HOST={string}"
 	@	echo "- Configure wordpress:          $$ sudo make configure_wordpress NAME={string} USER={string} PASSWORD={string} HOST={string}"
 	@	echo "- Start:                    (3) $$ sudo make start"
 	@	echo "- Fix HTTPS:                (4) $$ sudo make fix_https CA={string} CAPATH={string}"
@@ -143,16 +143,8 @@ configure_host:
 			echo "Error: Please run as root";                                                           \
 			exit;                                                                                       \
 		fi;                                                                                             \
-		if [ -z $(ADMIN) ]; then                                                                        \
-			echo "Error: ADMIN arg is not set";                                                         \
-			exit;                                                                                       \
-		fi;                                                                                             \
 		if [ -z $(CA) ]; then                                                                           \
 			echo "Error: CA arg is not set";                                                            \
-			exit;                                                                                       \
-		fi;                                                                                             \
-		if [ -z $(DOMAIN) ]; then                                                                       \
-			echo "Error: DOMAIN arg is not set";                                                        \
 			exit;                                                                                       \
 		fi;                                                                                             \
 		if [ -z $(HOST) ]; then                                                                         \
@@ -165,21 +157,9 @@ configure_host:
 		fi;                                                                                             \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                              \
 			while IFS='' read -r line || [[ -n "$$line" ]]; do                                          \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAdmin ")" ]; then                      \
-					if [ -z "$$(printf "%s" "$$line" | grep " $(ADMIN)@$(DOMAIN)$$")" ]; then           \
-						echo "Error: ServerAdmin -> Wrong";                                             \
-						exit;                                                                           \
-					fi;                                                                                 \
-				fi;                                                                                     \
 				if [ ! -z "$$(printf "%s" "$$line" | grep "ServerName ")" ]; then                       \
-					if [ -z "$$(printf "%s" "$$line" | grep " $(DOMAIN)$$")" ]; then                    \
-						echo "Error: ServerName -> Wrong";                                              \
-						exit;                                                                           \
-					fi;                                                                                 \
-				fi;                                                                                     \
-				if [ ! -z "$$(printf "%s" "$$line" | grep "ServerAlias ")" ]; then                      \
 					if [ -z "$$(printf "%s" "$$line" | grep " $(HOST)$$")" ]; then                      \
-						echo "Error: ServerAlias -> Wrong";                                             \
+						echo "Error: ServerName -> Wrong";                                              \
 						exit;                                                                           \
 					fi;                                                                                 \
 				fi;                                                                                     \
