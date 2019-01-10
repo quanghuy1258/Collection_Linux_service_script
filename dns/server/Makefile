@@ -53,39 +53,43 @@ uninstall:
 		fi;
 
 configure:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                 \
-			echo "Error: Please run as root";                                                        \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ -z "$(ZONE)" ]; then                                                                    \
-			echo "Error: ZONE arg is not set";                                                       \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		VAR_ZONE=$$(echo "$(ZONE)" | sed -r "s/\.+/./g" | sed -r "s/^\.//" | sed -r "s/\.$$//");     \
-		if [ ! -f $(PATH_PWD)/named.conf.$$VAR_ZONE ]; then                                          \
-			echo "Error: File named.conf.$$VAR_ZONE not found";                                      \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ -z "$$(cat $(PATH_PWD)/named.conf.$$VAR_ZONE | grep -E "^zone \"$$VAR_ZONE\"")" ]; then \
-			echo "Error: File named.conf.$$VAR_ZONE --> Syntax error";                               \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ ! -f $(PATH_PWD)/db.$$VAR_ZONE ]; then                                                  \
-			echo "Error: File db.$$VAR_ZONE not found";                                              \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                           \
-			if [ -z "$$(cat /etc/bind/named.conf.local | grep -E "^zone \"$$VAR_ZONE\"")" ]; then    \
-				cat $(PATH_PWD)/named.conf.$$VAR_ZONE >> /etc/bind/named.conf.local;                 \
-			fi;                                                                                      \
-			cp $(PATH_PWD)/db.$$VAR_ZONE /etc/bind/;                                                 \
-			echo "===== Done =====";                                                                 \
-			exit;                                                                                    \
-		fi;                                                                                          \
-		if [ -z "$(OS_ID)" ]; then                                                                   \
-			echo "Error: OS not supported";                                                          \
-		else                                                                                         \
-			echo "Error: $(OS_ID) OS not supported";                                                 \
+	@	if [ $$(id -u) -ne 0 ]; then                                                                             \
+			echo "Error: Please run as root";                                                                    \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ -z "$(ZONE)" ]; then                                                                                \
+			echo "Error: ZONE arg is not set";                                                                   \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		VAR_ZONE=$$(echo "$(ZONE)" | sed -r "s/\.+/./g" | sed -r "s/^\.//" | sed -r "s/\.$$//");                 \
+		if [ ! -f $(PATH_PWD)/named.conf.$$VAR_ZONE ]; then                                                      \
+			echo "Error: File named.conf.$$VAR_ZONE not found";                                                  \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ -z "$$(cat $(PATH_PWD)/named.conf.$$VAR_ZONE | grep -E "^zone \"$$VAR_ZONE\"")" ]; then             \
+			echo "Error: File named.conf.$$VAR_ZONE --> Syntax error: zone";                                     \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ -z "$$(cat $(PATH_PWD)/named.conf.$$VAR_ZONE | grep -E "file \"/etc/bind/db.$$VAR_ZONE\"")" ]; then \
+			echo "Error: File named.conf.$$VAR_ZONE --> Syntax error: file";                                     \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ ! -f $(PATH_PWD)/db.$$VAR_ZONE ]; then                                                              \
+			echo "Error: File db.$$VAR_ZONE not found";                                                          \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                       \
+			if [ -z "$$(cat /etc/bind/named.conf.local | grep -E "^zone \"$$VAR_ZONE\"")" ]; then                \
+				cat $(PATH_PWD)/named.conf.$$VAR_ZONE >> /etc/bind/named.conf.local;                             \
+			fi;                                                                                                  \
+			cp $(PATH_PWD)/db.$$VAR_ZONE /etc/bind/;                                                             \
+			echo "===== Done =====";                                                                             \
+			exit;                                                                                                \
+		fi;                                                                                                      \
+		if [ -z "$(OS_ID)" ]; then                                                                               \
+			echo "Error: OS not supported";                                                                      \
+		else                                                                                                     \
+			echo "Error: $(OS_ID) OS not supported";                                                             \
 		fi;
 
 start:
