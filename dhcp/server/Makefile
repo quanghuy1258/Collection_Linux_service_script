@@ -7,7 +7,7 @@ help:
 	@	echo "- Install dependencies:                    (1) $$ sudo make install"
 	@	echo "- Uninstall dependencies:                      $$ sudo make uninstall"
 	@	echo "- Configure:                               (2) $$ sudo make configure"
-	@	echo "- Assign network interface and IP address:     $$ sudo make iface_ip IFACE={string} IP={string}"
+	@	echo "- Assign network interface and IP address:     $$ sudo make iface_ip IFACE={string} IP={x.x.x.x/x}"
 	@	echo "- Start service:                           (3) $$ sudo make start"
 	@	echo "RECOMMEND: (1) -> (2) -> (3)"
 
@@ -81,32 +81,38 @@ configure:
 		fi;
 
 iface_ip:
-	@	if [ $$(id -u) -ne 0 ]; then                       \
-			echo "Error: Please run as root";              \
-			exit;                                          \
-		fi;                                                \
-		if [ -z $(IFACE) ]; then                           \
-			echo "Error: IFACE arg is not set";            \
-			exit;                                          \
-		fi;                                                \
-		if [ -z $(IP) ]; then                              \
-			echo "Error: IP arg is not set";               \
-			exit;                                          \
-		fi;                                                \
+	@	if [ $$(id -u) -ne 0 ]; then                                          \
+			echo "Error: Please run as root";                                 \
+			exit;                                                             \
+		fi;                                                                   \
+		echo "Check your args: IFACE=$(IFACE) IP=$(IP)";                      \
+		echo "Example: IFACE={string} IP={x.x.x.x/x}";                        \
+		read -r -p "Continue? [y/N] " response;                               \
+		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z $(IFACE) ]; then                                              \
+			echo "Error: IFACE arg is not set";                               \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z $(IP) ]; then                                                 \
+			echo "Error: IP arg is not set";                                  \
+			exit;                                                             \
+		fi;                                                                   \
 		if [ -z "$$(echo $(IP) | grep -E "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([0-9]|[1-2][0-9]|3[0-1])$$")" ]; then \
-			echo "Error: $(IP) wrong format -> x.x.x.x/x"; \
-			exit;                                          \
-		fi;                                                \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                 \
-			ip addr flush dev $(IFACE);                    \
-			ip addr add $(IP) dev $(IFACE);                \
-			echo "===== Done =====";                       \
-			exit;                                          \
-		fi;                                                \
-		if [ -z "$(OS_ID)" ]; then                         \
-			echo "Error: OS not supported";                \
-		else                                               \
-			echo "Error: $(OS_ID) OS not supported";       \
+			echo "Error: $(IP) wrong format -> x.x.x.x/x";                    \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                    \
+			ip addr flush dev $(IFACE);                                       \
+			ip addr add $(IP) dev $(IFACE);                                   \
+			echo "===== Done =====";                                          \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z "$(OS_ID)" ]; then                                            \
+			echo "Error: OS not supported";                                   \
+		else                                                                  \
+			echo "Error: $(OS_ID) OS not supported";                          \
 		fi;
 
 start:
