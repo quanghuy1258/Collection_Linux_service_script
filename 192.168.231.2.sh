@@ -15,7 +15,7 @@ if [ $(id -u) -ne 0 ]; then
 fi;
 
 cd dhcp/server/;
-mv 192.168.231.2.dhcpd.conf dhcpd.conf;
+cp 192.168.231.2.dhcpd.conf dhcpd.conf;
 make install;
 make configure;
 make iface_ip IFACE=$IFACE IP=192.168.231.2/24;
