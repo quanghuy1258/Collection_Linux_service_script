@@ -7,7 +7,7 @@ $TTL	604800
 			 604800 )	; Negative Cache TTL
 ;
 	IN	NS	ns.huyhy.com.
-	IN	MX	mail.huyhy.com.
+	IN	MX	1	mail.huyhy.com.
 ns	IN	A	192.168.231.2
 www	IN	A	172.16.231.251
 ftp	IN	A	172.16.231.251
