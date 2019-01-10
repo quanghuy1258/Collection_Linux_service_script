@@ -1,43 +1,102 @@
-# Using Makefile instead of bash script
+SHELL    := /bin/bash
+PATH_PWD := $(shell pwd)
+OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
-# $ sudo make all
-all:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                      \
-			echo "Error: Please run as root";                                                             \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		PATH_SSHD_CONFIG=$$(pwd)/sshd_config;                                                             \
-		if [ ! -f $$PATH_SSHD_CONFIG ]; then                                                              \
-			echo "Error: File sshd_config not found";                                                     \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		if [ ! -z "$$(shasum $$PATH_SSHD_CONFIG | grep 884d841989244fe2331a126cf392e6c6036008f3)" ]; then \
-			echo "Error: Please modify sshd_config file";                                                 \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		OS_ID=$$(cat /etc/os-release | grep "^ID=" | cut -c 4-);                                          \
-		if [ "$$OS_ID" = "ubuntu" ]; then                                                                 \
-			if [ -z "$$(apt list --installed | grep openssh-client)" ]; then                              \
-				echo "Installing openssh-client ...";                                                     \
-				sudo apt-get -y install openssh-client;                                                   \
-			fi;                                                                                           \
-			if [ -z "$$(apt list --installed | grep openssh-server)" ]; then                              \
-				echo "Installing openssh-server ...";                                                     \
-				sudo apt-get -y install openssh-server;                                                   \
-			fi;                                                                                           \
-			cp $$PATH_SSHD_CONFIG /etc/ssh/sshd_config;                                                   \
-			sudo systemctl restart sshd.service;                                                          \
-			exit;                                                                                         \
-		fi;                                                                                               \
-		if [ -z "$$OS_ID" ]; then                                                                         \
-			echo "Error: OS not supported";                                                               \
-		else                                                                                              \
-			echo "Error: $$OS_ID OS not supported";                                                       \
+help:
+	@	echo "- Show help:                  $$ make help"
+	@	echo "- Install dependencies:   (1) $$ sudo make install"
+	@	echo "- Uninstall dependencies:     $$ sudo make uninstall"
+	@	echo "- Configure:              (2) $$ sudo make configure"
+	@	echo "- Start service:          (3) $$ sudo make start"
+	@	echo "RECOMMEND: (1) -> (2) -> (3)"
+
+install:
+	@	if [ $$(id -u) -ne 0 ]; then                                             \
+			echo "Error: Please run as root";                                    \
+			exit;                                                                \
+		fi;                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                       \
+			if [ -z "$$(apt list --installed | grep "^openssh-client/")" ]; then \
+				echo "===== Install openssh-client =====";                       \
+				apt-get -y install openssh-client;                               \
+			fi;                                                                  \
+			if [ -z "$$(apt list --installed | grep "^openssh-server/")" ]; then \
+				echo "===== Install openssh-server =====";                       \
+				apt-get -y install openssh-server;                               \
+			fi;                                                                  \
+			echo "===== Done =====";                                             \
+			exit;                                                                \
+		fi;                                                                      \
+		if [ -z "$(OS_ID)" ]; then                                               \
+			echo "Error: OS not supported";                                      \
+		else                                                                     \
+			echo "Error: $(OS_ID) OS not supported";                             \
 		fi;
 
-# $ make list_targets
-# List all possible targets
-list_targets:
-	@	echo "all";
-	@	echo "list_targets";
+uninstall:
+	@	if [ $$(id -u) -ne 0 ]; then                                                       \
+			echo "Error: Please run as root";                                              \
+			exit;                                                                          \
+		fi;                                                                                \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                 \
+			if [ ! -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
+				echo "===== Stop sshd.service =====";                                      \
+				systemctl stop sshd.service;                                               \
+			fi;                                                                            \
+			if [ ! -z "$$(apt list --installed | grep "^openssh-server/")" ]; then         \
+				echo "===== Uninstall openssh-server =====";                               \
+				apt-get -y purge openssh-server;                                           \
+			fi;                                                                            \
+			echo "===== Done =====";                                                       \
+			exit;                                                                          \
+		fi;                                                                                \
+		if [ -z "$(OS_ID)" ]; then                                                         \
+			echo "Error: OS not supported";                                                \
+		else                                                                               \
+			echo "Error: $(OS_ID) OS not supported";                                       \
+		fi;
 
+configure:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                           \
+			echo "Error: Please run as root";                                                                  \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ ! -z "$$(shasum $(PATH_PWD)/sshd_config | grep 37503d2ac009c25f88f86a4961be83d0944afcd6)" ]; then \
+			echo "Warning: Please modify sshd_config file";                                                    \
+			read -r -p "Continue? [y/N] " response;                                                            \
+			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                              \
+				exit;                                                                                          \
+			fi;                                                                                                \
+		fi;                                                                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                     \
+			cp $(PATH_PWD)/sshd_config /etc/ssh/sshd_config;                                                   \
+			echo "===== Done =====";                                                                           \
+			exit;                                                                                              \
+		fi;                                                                                                    \
+		if [ -z "$(OS_ID)" ]; then                                                                             \
+			echo "Error: OS not supported";                                                                    \
+		else                                                                                                   \
+			echo "Error: $(OS_ID) OS not supported";                                                           \
+		fi;
+
+start:
+	@	if [ $$(id -u) -ne 0 ]; then                                                     \
+			echo "Error: Please run as root";                                            \
+			exit;                                                                        \
+		fi;                                                                              \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                               \
+			if [ -z "$$(systemctl status sshd.service | grep "Active: active ")" ]; then \
+				echo "===== Start sshd.service =====";                                   \
+				systemctl start sshd.service;                                            \
+			else                                                                         \
+				echo "===== Restart sshd.service =====";                                 \
+				systemctl restart sshd.service;                                          \
+			fi;                                                                          \
+			echo "===== Done =====";                                                     \
+			exit;                                                                        \
+		fi;                                                                              \
+		if [ -z "$(OS_ID)" ]; then                                                       \
+			echo "Error: OS not supported";                                              \
+		else                                                                             \
+			echo "Error: $(OS_ID) OS not supported";                                     \
+		fi;
