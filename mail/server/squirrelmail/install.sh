@@ -41,7 +41,7 @@ if [ "$OS_ID" = "ubuntu" ]; then
 	tar -xf squirrelmail-webmail-1.4.22.tar.gz;
 	rm -rf squirrelmail-webmail-1.4.22.tar.gz;
 	mv squirrelmail-webmail-1.4.22 /var/www/html/squirrelmail/;
-	chown -R root:root /var/www/html/squirrelmail/;
+	chown -R www-data:www-data /var/www/html/squirrelmail/;
 	mkdir -p /var/local/squirrelmail/data/;
 	chown -R www-data:www-data /var/local/squirrelmail/data/;
 	mkdir -p /var/local/squirrelmail/attach/;
