@@ -1,0 +1,3 @@
+V	290108165855Z		01	unknown	/C=VN/ST=HCMC/L=Ho Chi Minh City/O=FIT HCMUS/OU=Huy and Hy/CN=www.huyhy.com/name=root/emailAddress=root@huyhy.com
+V	290108165929Z		02	unknown	/C=VN/ST=HCMC/L=Ho Chi Minh City/O=FIT HCMUS/OU=Huy and Hy/CN=www.huyhymedia.com/name=root/emailAddress=root@huyhy.com
+V	290108170009Z		03	unknown	/C=VN/ST=HCMC/L=Ho Chi Minh City/O=FIT HCMUS/OU=Huy and Hy/CN=mail.huyhy.com/name=root/emailAddress=root@huyhy.com

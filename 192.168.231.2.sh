@@ -18,7 +18,9 @@ cd dhcp/server/;
 cp 192.168.231.2.dhcpd.conf dhcpd.conf;
 make install;
 make configure;
+read -n1 -r -p "Press any key to continue..." key;
 make iface_ip IFACE=$IFACE IP=192.168.231.2/24;
+read -n1 -r -p "Press any key to continue..." key;
 make start;
 rm -rf dhcpd.conf;
 cd ../../;
@@ -29,6 +31,7 @@ read -n1 -r -p "Press any key to continue..." key;
 cd dns/server/;
 make install;
 make configure ZONE=huyhy.com;
+read -n1 -r -p "Press any key to continue..." key;
 make start;
 cd ../../;
 
