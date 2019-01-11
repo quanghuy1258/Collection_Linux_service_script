@@ -53,6 +53,7 @@ make configure_wordpress NAME=$WP_NAME USER=$WP_USER PASSWORD=$WP_PASSWORD HOST=
 read -n1 -r -p "Press any key to continue..." key;
 make start;
 cd ../../;
+cp web/server/www.huyhy.com/droot/index.html /var/www/html/www.huyhy.com/;
 
 echo "===== Web: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
