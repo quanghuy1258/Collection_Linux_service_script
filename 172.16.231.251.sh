@@ -38,7 +38,7 @@ read -n1 -r -p "Press any key to continue..." key;
 cp easy-rsa/keys/ca.crt web/server/www.huyhy.com/cacert.pem;
 cp easy-rsa/keys/www.huyhy.com.crt web/server/www.huyhy.com/www.huyhy.com.pem;
 cp easy-rsa/keys/www.huyhy.com.key web/server/www.huyhy.com/www.huyhy.com.key;
-cp easy-rsa/keys/ca.crt web/server/cacert.pem;
+cp easy-rsa/keys/ca.crt web/server/www.huyhymedia.com/cacert.pem;
 cp easy-rsa/keys/www.huyhymedia.com.crt web/server/www.huyhymedia.com/www.huyhymedia.com.pem;
 cp easy-rsa/keys/www.huyhymedia.com.key web/server/www.huyhymedia.com/www.huyhymedia.com.key;
 cd web/server/;
@@ -53,6 +53,7 @@ read -n1 -r -p "Press any key to continue..." key;
 make configure_wordpress NAME=$WP_NAME USER=$WP_USER PASSWORD=$WP_PASSWORD HOST=www.huyhymedia.com
 read -n1 -r -p "Press any key to continue..." key;
 make start;
+make fix_https CA=cacert CAPATH=../../easy-rsa/keys/ca.crt;
 cd ../../;
 cp -r web/server/www.huyhy.com/droot/* /var/www/html/www.huyhy.com/;
 mkdir -p /home/forum;
