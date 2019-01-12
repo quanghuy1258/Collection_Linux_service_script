@@ -14,7 +14,6 @@ if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']))
         exit;
     } else {
         echo '<p>Secret message: This is a <a href="http://bit.ly/2D59yVq">map</a> to get treasure!!!</p>';
-        echo '<p><a href="/admin/index.php?logout">Sign out</a></p>';
         exit;
     }
 } else {

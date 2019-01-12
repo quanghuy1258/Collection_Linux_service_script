@@ -45,6 +45,7 @@ read -n1 -r -p "Press any key to continue..." key;
 make start;
 make fix_https CA=cacert CAPATH=../../easy-rsa/keys/ca.crt;
 cd ../../;
+read -n1 -r -p "Press any key to continue..." key;
 cp -r web/server/www.huyhy.com/droot/* /var/www/html/www.huyhy.com/;
 mkdir -p /home/forum;
 wget https://www.phpbb.com/files/release/phpBB-3.2.5.zip;
