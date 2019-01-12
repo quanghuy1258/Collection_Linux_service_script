@@ -8,3 +8,14 @@
 7. 0
 8. +
 9. all
+===== phpbb configure =====
+Database type: MySQL with MySQLi extension
+Database server hostname or DSN: localhost
+Database server port:
+Database username: forum
+Database password: 1234567
+Database name: forum
+Prefix for tables in database: phpbb_
+
+After install, do:
+# rm -rf /home/forum/install
