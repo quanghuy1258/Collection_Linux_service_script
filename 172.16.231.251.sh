@@ -63,6 +63,10 @@ cat forum.sql | mysql --defaults-extra-file=/etc/mysql/debian.cnf;
 rm -rf forum.sql;
 mkdir -p /home/forum;
 wget https://www.phpbb.com/files/release/phpBB-3.2.5.zip;
+if [ -z "$(apt list --installed | grep "^unzip/")" ]; then
+	echo "===== Install unzip =====";
+	apt-get -y install unzip;
+fi;
 unzip phpBB-3.2.5.zip;
 cp -r phpBB3/* /home/forum/;
 chown -R www-data:www-data /home/forum/;
