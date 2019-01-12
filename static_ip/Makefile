@@ -39,6 +39,10 @@ static:
 			exit;                                                                                                         \
 		fi;                                                                                                               \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                \
+			if [ -z "$$(apt list --installed | grep "^ifupdown/")" ]; then                                                \
+				echo "===== Install ifupdown =====";                                                                      \
+				apt-get -y install ifupdown;                                                                              \
+			fi;                                                                                                           \
 			if [ ! -f $(PATH_PWD)/interfaces.bak ]; then                                                                  \
 				cp /etc/network/interfaces $(PATH_PWD)/interfaces.bak;                                                    \
 			fi;                                                                                                           \
@@ -54,6 +58,8 @@ static:
 				printf "dns-nameservers $(DNS)\n" >>/etc/network/interfaces;                                              \
 				printf "\n" >>/etc/network/interfaces;                                                                    \
 				ip addr flush $(IFACE);                                                                                   \
+				ifdown $(IFACE);                                                                                          \
+				ifup $(IFACE);                                                                                            \
 				if [ -z "$$(systemctl status networking.service | grep "Active: active ")" ]; then                        \
 					echo "===== Start networking.service =====";                                                          \
 					systemctl start networking.service;                                                                   \
