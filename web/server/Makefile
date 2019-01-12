@@ -14,34 +14,34 @@ help:
 	@	echo "RECOMMEND: (1) -> (2) -> (3) [-> (4)]"
 
 install:
-	@	if [ $$(id -u) -ne 0 ]; then                                                      \
-			echo "Error: Please run as root";                                             \
-			exit;                                                                         \
-		fi;                                                                               \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                \
-			if [ -z "$$(apt list --installed | grep "^apache2/")" ]; then                 \
-				echo "===== Install apache2 =====";                                       \
-				sudo apt-get -y install apache2;                                          \
-			fi;                                                                           \
-			if [ -z "$$(apt list --installed | grep "^mysql-server/")" ]; then            \
-				echo "===== Install mysql-server =====";                                  \
-				sudo apt-get -y install mysql-server;                                     \
-			fi;                                                                           \
-			if [ -z "$$(apt list --installed | grep "^php/")" ]; then                     \
-				echo "===== Install php =====";                                           \
-				sudo apt-get -y install php libapache2-mod-php php-cli php-cgi php-mysql; \
-			fi;                                                                           \
-			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                 \
-				echo "===== Install openssl =====";                                       \
-				sudo apt-get -y install openssl;                                          \
-			fi;                                                                           \
-			echo "===== Done =====";                                                      \
-			exit;                                                                         \
-		fi;                                                                               \
-		if [ -z "$(OS_ID)" ]; then                                                        \
-			echo "Error: OS not supported";                                               \
-		else                                                                              \
-			echo "Error: $(OS_ID) OS not supported";                                      \
+	@	if [ $$(id -u) -ne 0 ]; then                                                              \
+			echo "Error: Please run as root";                                                     \
+			exit;                                                                                 \
+		fi;                                                                                       \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                        \
+			if [ -z "$$(apt list --installed | grep "^apache2/")" ]; then                         \
+				echo "===== Install apache2 =====";                                               \
+				sudo apt-get -y install apache2;                                                  \
+			fi;                                                                                   \
+			if [ -z "$$(apt list --installed | grep "^mysql-server/")" ]; then                    \
+				echo "===== Install mysql-server =====";                                          \
+				sudo apt-get -y install mysql-server;                                             \
+			fi;                                                                                   \
+			if [ -z "$$(apt list --installed | grep "^php/")" ]; then                             \
+				echo "===== Install php =====";                                                   \
+				sudo apt-get -y install php libapache2-mod-php php-cli php-cgi php-mysql php-xml; \
+			fi;                                                                                   \
+			if [ -z "$$(apt list --installed | grep "^openssl/")" ]; then                         \
+				echo "===== Install openssl =====";                                               \
+				sudo apt-get -y install openssl;                                                  \
+			fi;                                                                                   \
+			echo "===== Done =====";                                                              \
+			exit;                                                                                 \
+		fi;                                                                                       \
+		if [ -z "$(OS_ID)" ]; then                                                                \
+			echo "Error: OS not supported";                                                       \
+		else                                                                                      \
+			echo "Error: $(OS_ID) OS not supported";                                              \
 		fi;
 
 uninstall:
@@ -68,7 +68,7 @@ uninstall:
 			fi;                                                                               \
 			if [ ! -z "$$(apt list --installed | grep "^php/")" ]; then                       \
 				echo "===== Uninstall php =====";                                             \
-				apt-get -y purge php libapache2-mod-php php-cli php-cgi php-mysql;            \
+				apt-get -y purge php libapache2-mod-php php-cli php-cgi php-mysql php-xml;    \
 			fi;                                                                               \
 			echo "===== Done =====";                                                          \
 			exit;                                                                             \
