@@ -32,6 +32,7 @@ static:
 			echo "Error: DNS arg is not set";                                                                            \
 			exit;                                                                                                        \
 		fi;                                                                                                              \
+		echo "Check your args: IFACE=$(IFACE), IP=$(IP), NETMASK=$(NETMASK), GATEWAY=$(GATEWAY), DNS=$(DNS)";            \
 		echo "Warning: Example -> IFACE=x.x.x.x, IP=x.x.x.x, NETMASK=x.x.x.x, GATEWAY=x.x.x.x, DNS=\"x.x.x.x y.y.y.y\""; \
 		read -r -p "Continue? [y/N] " response;                                                                          \
 		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                            \
