@@ -45,6 +45,7 @@ cd web/server/;
 make install;
 read -n1 -r -p "Press any key to continue..." key;
 make configure;
+read -n1 -r -p "Press any key to continue..." key;
 make configure_host CA=cacert HOST=www.huyhy.com;
 read -n1 -r -p "Press any key to continue..." key;
 make configure_host CA=cacert HOST=www.huyhymedia.com;
@@ -53,7 +54,14 @@ make configure_wordpress NAME=$WP_NAME USER=$WP_USER PASSWORD=$WP_PASSWORD HOST=
 read -n1 -r -p "Press any key to continue..." key;
 make start;
 cd ../../;
-cp web/server/www.huyhy.com/droot/index.html /var/www/html/www.huyhy.com/;
+cp -r web/server/www.huyhy.com/droot/* /var/www/html/www.huyhy.com/;
+mkdir -p /home/forum;
+wget https://www.phpbb.com/files/release/phpBB-3.2.5.zip;
+unzip phpBB-3.2.5.zip;
+cp -r phpBB3/* /home/forum/;
+chown -R www-data:www-data /home/forum/;
+chmod -R 755 /home/forum/;
+rm -rf phpBB-3.2.5.zip phpBB3;
 
 echo "===== Web: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
