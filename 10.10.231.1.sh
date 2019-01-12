@@ -70,3 +70,15 @@ iptables -A FORWARD -i $INTERNAL_IFACE -o $DMZ_IFACE -s 192.168.231.0/24 -j ACCE
 cd routing/;
 make routing IFACE=$PUBLIC_IFACE;
 cd ../;
+
+echo "===== Firewall + NAT: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
+cd static_ip/;
+make static IFACE=$PUBLIC_IFACE IP=10.10.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
+make static IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
+make static IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
+cd ../;
+
+echo "===== Set static ip: Done =====";
+
