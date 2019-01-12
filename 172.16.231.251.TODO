@@ -9,6 +9,10 @@
 8. +
 9. all
 ===== phpbb configure =====
+Need configure:
+1. Administrator configuration
+2. Database configuration
+
 Database type: MySQL with MySQLi extension
 Database server hostname or DSN: localhost
 Database server port:
@@ -17,5 +21,9 @@ Database password: 1234567
 Database name: forum
 Prefix for tables in database: phpbb_
 
+3. -> Default
+4. -> Default
+5. Bulletin Board configuration
+
 After install, do:
-# rm -rf /home/forum/install
+$ sudo rm -rf /home/forum/install

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+IFACE="";
+
+# Check parameters
+if [ -z "$IFACE" ]; then
+	echo "Check parametes";
+	exit 1;
+fi;
+
 #Check using sudo or not
 if [ $(id -u) -ne 0 ]; then
 	echo "Error: Please run as root";
@@ -63,3 +71,21 @@ rm -rf phpBB-3.2.5.zip phpBB3;
 
 echo "===== Web: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
+
+cd ssh/server/;
+cp 172.16.231.251.sshd_config sshd_config;
+make install;
+read -n1 -r -p "Press any key to continue..." key;
+make configure;
+read -n1 -r -p "Press any key to continue..." key;
+make start;
+cd ../../;
+
+echo "===== SSH: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
+cd static_ip/;
+make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4"
+cd ../;
+
+echo "===== Set static ip: Done =====";

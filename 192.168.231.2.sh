@@ -42,6 +42,6 @@ read -n1 -r -p "Press any key to continue..." key;
 
 cd static_ip/;
 make static IFACE=$IFACE IP=192.168.231.2 NETMASK=255.255.255.0 GATEWAY=192.168.231.1 DNS="8.8.8.8 8.8.4.4"
-cd ../../;
+cd ../;
 
 echo "===== Set static ip: Done =====";
