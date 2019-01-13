@@ -4,7 +4,7 @@ OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
 help:
 	@	echo "- Show help:         $$ make help"
-	@	echo "- Set static ip: (1) $$ sudo make static IFACE={string} IP={string} NETMASK={string} GATEWAY={string} DNS={string}"
+	@	echo "- Set static ip: (1) $$ sudo make static IFACE={string} IP={x.x.x.x} NETMASK={x.x.x.x} GATEWAY={x.x.x.x} DNS={x.x.x.x y.y.y.y}"
 	@	echo "RECOMMEND: (1)"
 
 static:
