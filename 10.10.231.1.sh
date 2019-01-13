@@ -37,6 +37,10 @@ iptables -P OUTPUT ACCEPT;
 iptables -P INPUT ACCEPT;
 iptables -P FORWARD DROP;
 
+# Block ssh from outside
+iptables -A INPUT -p tcp --dport 22 -s 10.10.231.0/24 -j DROP;
+iptables -A INPUT -p udp --dport 22 -s 10.10.231.0/24 -j DROP;
+
 # Allow services
 # DMZ
 iptables -A FORWARD -i $DMZ_IFACE -o $PUBLIC_IFACE -s 172.16.231.0/24 -j ACCEPT;
