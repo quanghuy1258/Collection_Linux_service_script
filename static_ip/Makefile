@@ -25,12 +25,10 @@ static:
 			exit;                                                                                                         \
 		fi;                                                                                                               \
 		if [ -z "$(GATEWAY)" ]; then                                                                                      \
-			echo "Error: GATEWAY arg is not set";                                                                         \
-			exit;                                                                                                         \
+			echo "Warning: GATEWAY arg is not set";                                                                       \
 		fi;                                                                                                               \
 		if [ -z "$(DNS)" ]; then                                                                                          \
-			echo "Error: DNS arg is not set";                                                                             \
-			exit;                                                                                                         \
+			echo "Warning: DNS arg is not set";                                                                           \
 		fi;                                                                                                               \
 		echo "Check your args: IFACE=$(IFACE), IP=$(IP), NETMASK=$(NETMASK), GATEWAY=$(GATEWAY), DNS=$(DNS)";             \
 		echo "Warning: Example -> IFACE={string}, IP=x.x.x.x, NETMASK=x.x.x.x, GATEWAY=x.x.x.x, DNS=\"x.x.x.x y.y.y.y\""; \
@@ -54,8 +52,12 @@ static:
 				printf "iface $(IFACE) inet static\n" >>/etc/network/interfaces;                                          \
 				printf "address $(IP)\n" >>/etc/network/interfaces;                                                       \
 				printf "netmask $(NETMASK)\n" >>/etc/network/interfaces;                                                  \
-				printf "gateway $(GATEWAY)\n" >>/etc/network/interfaces;                                                  \
-				printf "dns-nameservers $(DNS)\n" >>/etc/network/interfaces;                                              \
+				if [ ! -z "$(GATEWAY)" ]; then                                                                            \
+					printf "gateway $(GATEWAY)\n" >>/etc/network/interfaces;                                              \
+				fi;                                                                                                       \
+				if [ ! -z "$(DNS)" ]; then                                                                                \
+					printf "dns-nameservers $(DNS)\n" >>/etc/network/interfaces;                                          \
+				fi;                                                                                                       \
 				printf "\n" >>/etc/network/interfaces;                                                                    \
 				ip addr flush $(IFACE);                                                                                   \
 				ifdown $(IFACE);                                                                                          \
