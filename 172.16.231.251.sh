@@ -14,6 +14,13 @@ if [ $(id -u) -ne 0 ]; then
 	exit 1;
 fi;
 
+cd static_ip/;
+make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4"
+cd ../;
+
+echo "===== Set static ip: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
 cp easy-rsa/keys/ca.crt mail/server/ssl/cacert.pem;
 cp easy-rsa/keys/mail.huyhy.com.crt mail/server/ssl/mail.huyhy.com.crt;
 cp easy-rsa/keys/mail.huyhy.com.key mail/server/ssl/mail.huyhy.com.key;
@@ -86,10 +93,3 @@ make start;
 cd ../../;
 
 echo "===== SSH: Done =====";
-read -n1 -r -p "Press any key to continue..." key;
-
-cd static_ip/;
-make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4"
-cd ../;
-
-echo "===== Set static ip: Done =====";
