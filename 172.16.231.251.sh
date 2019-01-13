@@ -15,7 +15,7 @@ if [ $(id -u) -ne 0 ]; then
 fi;
 
 cd static_ip/;
-make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4";
+make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS=192.168.231.2;
 cd ../;
 
 echo "===== Set static ip: Done =====";
