@@ -25,6 +25,8 @@ cd ../;
 read -n1 -r -p "Press any key to continue..." key;
 echo "===== Set static ip: Done =====";
 
+echo 1 > /proc/sys/net/ipv4/ip_forward;
+
 # Delete old iptables rules
 # and temporarily block all traffic.
 iptables -P OUTPUT DROP;
@@ -34,12 +36,20 @@ iptables -F;
 
 # Set default policies
 iptables -P OUTPUT ACCEPT;
-iptables -P INPUT ACCEPT;
+iptables -P INPUT DROP;
 iptables -P FORWARD DROP;
 
-# Block ssh from outside
-iptables -A INPUT -p tcp --dport 22 -s 10.10.231.0/24 -j DROP;
-iptables -A INPUT -p udp --dport 22 -s 10.10.231.0/24 -j DROP;
+# Allow local loopback
+iptables -A INPUT -s 127.0.0.0/8 -j ACCEPT;
+iptables -A INPUT -d 127.0.0.0/8 -j ACCEPT;
+
+# Allow incoming pings
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT;
+iptables -A INPUT -p icmp --icmp-type echo-reply   -j ACCEPT;
+
+# Allow firewall can connect to another host
+iptables -A OUTPUT -m state --state NEW -j ACCEPT;
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;
 
 # Allow services
 # DMZ
