@@ -16,6 +16,15 @@ if [ $(id -u) -ne 0 ]; then
 	exit 1;
 fi;
 
+cd static_ip/;
+make static IFACE=$PUBLIC_IFACE IP=10.10.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.2 DNS="8.8.8.8 8.8.4.4";
+make static IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0;
+make static IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0;
+cd ../;
+
+read -n1 -r -p "Press any key to continue..." key;
+echo "===== Set static ip: Done =====";
+
 # Delete old iptables rules
 # and temporarily block all traffic.
 iptables -P OUTPUT DROP;
@@ -72,13 +81,4 @@ make routing IFACE=$PUBLIC_IFACE;
 cd ../;
 
 echo "===== Firewall + NAT: Done =====";
-read -n1 -r -p "Press any key to continue..." key;
-
-cd static_ip/;
-make static IFACE=$PUBLIC_IFACE IP=10.10.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
-make static IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
-make static IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.1 DNS="8.8.8.8 8.8.4.4"
-cd ../;
-
-echo "===== Set static ip: Done =====";
 

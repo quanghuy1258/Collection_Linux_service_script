@@ -15,7 +15,7 @@ if [ $(id -u) -ne 0 ]; then
 fi;
 
 cd static_ip/;
-make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4"
+make static IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS="8.8.8.8 8.8.4.4";
 cd ../;
 
 echo "===== Set static ip: Done =====";
@@ -55,7 +55,7 @@ make configure_host CA=cacert HOST=www.huyhy.com;
 read -n1 -r -p "Press any key to continue..." key;
 make configure_host CA=cacert HOST=www.huyhymedia.com;
 read -n1 -r -p "Press any key to continue..." key;
-make configure_wordpress NAME=wordpress USER=wordpress PASSWORD=1234567 HOST=www.huyhymedia.com
+make configure_wordpress NAME=wordpress USER=wordpress PASSWORD=1234567 HOST=www.huyhymedia.com;
 read -n1 -r -p "Press any key to continue..." key;
 make start;
 make fix_https CA=cacert CAPATH=../../easy-rsa/keys/ca.crt;
