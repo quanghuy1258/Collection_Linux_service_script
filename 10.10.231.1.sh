@@ -48,7 +48,6 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT;
 iptables -A INPUT -p icmp --icmp-type echo-reply   -j ACCEPT;
 
 # Allow firewall can connect to another host
-iptables -A OUTPUT -m state --state NEW -j ACCEPT;
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;
 
 # Allow services
