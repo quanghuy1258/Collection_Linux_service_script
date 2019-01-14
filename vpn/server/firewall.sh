@@ -11,6 +11,8 @@ iptables -A INPUT -i tun+ -j ACCEPT
 iptables -A FORWARD -i tun+ -j ACCEPT
 iptables -A INPUT -i tap+ -j ACCEPT
 iptables -A FORWARD -i tap+ -j ACCEPT
+iptables -A INPUT -i br+ -j ACCEPT
+iptables -A FORWARD -i br+ -j ACCEPT
 
 iptables -A OUTPUT -m state --state NEW -o $INTERNET_INTERFACE -j ACCEPT
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
