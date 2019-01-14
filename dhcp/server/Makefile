@@ -58,7 +58,7 @@ configure:
 			echo "Error: Please run as root";                                                                 \
 			exit;                                                                                             \
 		fi;                                                                                                   \
-		if [ ! -f $(PATH_PWD)/dhcpd.conf ]; then                                                              \
+		if [ ! -f "$(PATH_PWD)/dhcpd.conf" ]; then                                                            \
 			echo "Error: File dhcpd.conf not found";                                                          \
 			exit;                                                                                             \
 		fi;                                                                                                   \
@@ -67,7 +67,7 @@ configure:
 			exit;                                                                                             \
 		fi;                                                                                                   \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                    \
-			if [ -f /etc/dhcp/dhcpd.conf ] && [ ! -f /etc/dhcp/dhcpd.conf.bak ]; then                         \
+			if [ -f "/etc/dhcp/dhcpd.conf" ] && [ ! -f "/etc/dhcp/dhcpd.conf.bak" ]; then                     \
 				cp /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.bak;                                             \
 			fi;                                                                                               \
 			cp $(PATH_PWD)/dhcpd.conf /etc/dhcp/dhcpd.conf;                                                   \
@@ -91,11 +91,11 @@ iface_ip:
 		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then \
 			exit;                                                             \
 		fi;                                                                   \
-		if [ -z $(IFACE) ]; then                                              \
+		if [ -z "$(IFACE)" ]; then                                            \
 			echo "Error: IFACE arg is not set";                               \
 			exit;                                                             \
 		fi;                                                                   \
-		if [ -z $(IP) ]; then                                                 \
+		if [ -z "$(IP)" ]; then                                               \
 			echo "Error: IP arg is not set";                                  \
 			exit;                                                             \
 		fi;                                                                   \

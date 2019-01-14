@@ -92,7 +92,7 @@ configure:
 			a2enmod php*;                                                                                                        \
 			echo "Info: Allow only localhost in default site for testing";                                                       \
 			if [ -z "$$(cat /etc/apache2/sites-available/000-default.conf | grep " Configured: configure")" ]; then              \
-				if [ -f /etc/apache2/sites-available/000-default.conf ] && [ ! -f $(PATH_PWD)/000-default.conf.bak ]; then       \
+				if [ -f "/etc/apache2/sites-available/000-default.conf" ] && [ ! -f "$(PATH_PWD)/000-default.conf.bak" ]; then   \
 					cp /etc/apache2/sites-available/000-default.conf $(PATH_PWD)/000-default.conf.bak;                           \
 				fi;                                                                                                              \
 				rm /etc/apache2/sites-available/000-default.conf;                                                                \
@@ -110,7 +110,7 @@ configure:
 				printf "%s\n" "# Configured: configure" >>/etc/apache2/sites-available/000-default.conf;                         \
 			fi;                                                                                                                  \
 			if [ -z "$$(cat /etc/apache2/sites-available/default-ssl.conf | grep " Configured: configure")" ]; then              \
-				if [ -f /etc/apache2/sites-available/default-ssl.conf ] && [ ! -f $(PATH_PWD)/default-ssl.conf.bak ]; then       \
+				if [ -f "/etc/apache2/sites-available/default-ssl.conf" ] && [ ! -f "$(PATH_PWD)/default-ssl.conf.bak" ]; then   \
 					cp /etc/apache2/sites-available/default-ssl.conf $(PATH_PWD)/default-ssl.conf.bak;                           \
 				fi;                                                                                                              \
 				rm /etc/apache2/sites-available/default-ssl.conf;                                                                \
@@ -143,15 +143,15 @@ configure_host:
 			echo "Error: Please run as root";                                                           \
 			exit;                                                                                       \
 		fi;                                                                                             \
-		if [ -z $(CA) ]; then                                                                           \
+		if [ -z "$(CA)" ]; then                                                                         \
 			echo "Error: CA arg is not set";                                                            \
 			exit;                                                                                       \
 		fi;                                                                                             \
-		if [ -z $(HOST) ]; then                                                                         \
+		if [ -z "$(HOST)" ]; then                                                                       \
 			echo "Error: HOST arg is not set";                                                          \
 			exit;                                                                                       \
 		fi;                                                                                             \
-		if [ ! -f $(PATH_PWD)/$(HOST)/$(HOST).conf ]; then                                              \
+		if [ ! -f "$(PATH_PWD)/$(HOST)/$(HOST).conf" ]; then                                            \
 			echo "Error: File $(HOST)/$(HOST).conf not found";                                          \
 			exit;                                                                                       \
 		fi;                                                                                             \
@@ -203,10 +203,10 @@ configure_host:
 			echo "Info: Configure ssl";                                                                 \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).pem /etc/ssl/certs/$(HOST).pem;                              \
 			cp $(PATH_PWD)/$(HOST)/$(HOST).key /etc/ssl/private/$(HOST).key;                            \
-			if [ -f $(PATH_PWD)/$(HOST)/$(CA).pem ]; then                                               \
+			if [ -f "$(PATH_PWD)/$(HOST)/$(CA).pem" ]; then                                             \
 				cp $(PATH_PWD)/$(HOST)/$(CA).pem /etc/ssl/certs/$(CA).pem;                              \
 			else                                                                                        \
-				if [ ! -f /etc/ssl/certs/$(CA).pem ]; then                                              \
+				if [ ! -f "/etc/ssl/certs/$(CA).pem" ]; then                                            \
 					echo "Error: File /etc/ssl/certs/$(CA).pem not found";                              \
 					exit;                                                                               \
 				fi;                                                                                     \
@@ -234,23 +234,23 @@ configure_wordpress:
 			echo "Error: Please run as root";                                                      \
 			exit;                                                                                  \
 		fi;                                                                                        \
-		if [ -z $(NAME) ]; then                                                                    \
+		if [ -z "$(NAME)" ]; then                                                                  \
 			echo "Error: NAME arg is not set";                                                     \
 			exit;                                                                                  \
 		fi;                                                                                        \
-		if [ -z $(USER) ]; then                                                                    \
+		if [ -z "$(USER)" ]; then                                                                  \
 			echo "Error: USER arg is not set";                                                     \
 			exit;                                                                                  \
 		fi;                                                                                        \
-		if [ -z $(PASSWORD) ]; then                                                                \
+		if [ -z "$(PASSWORD)" ]; then                                                              \
 			echo "Error: PASSWORD arg is not set";                                                 \
 			exit;                                                                                  \
 		fi;                                                                                        \
-		if [ -z $(HOST) ]; then                                                                    \
+		if [ -z "$(HOST)" ]; then                                                                  \
 			echo "Error: DB_HOST arg is not set";                                                  \
 			exit;                                                                                  \
 		fi;                                                                                        \
-		if [ ! -f /etc/apache2/sites-available/$(HOST).conf ]; then                                \
+		if [ ! -f "/etc/apache2/sites-available/$(HOST).conf" ]; then                              \
 			echo "Error: Site $(HOST) is not set";                                                 \
 			exit;                                                                                  \
 		fi;                                                                                        \
@@ -315,15 +315,15 @@ fix_https:
 			echo "Error: Please run as root";                                                    \
 			exit;                                                                                \
 		fi;                                                                                      \
-		if [ -z $(CA) ]; then                                                                    \
+		if [ -z "$(CA)" ]; then                                                                  \
 			echo "Error: CA arg is not set";                                                     \
 			exit;                                                                                \
 		fi;                                                                                      \
-		if [ -z $(CAPATH) ]; then                                                                \
+		if [ -z "$(CAPATH)" ]; then                                                              \
 			echo "Error: PATH arg is not set";                                                   \
 			exit;                                                                                \
 		fi;                                                                                      \
-		if [ ! -f $(CAPATH) ]; then                                                              \
+		if [ ! -f "$(CAPATH)" ]; then                                                            \
 			echo "Error: File $(CAPATH) not found";                                              \
 			exit;                                                                                \
 		fi;                                                                                      \

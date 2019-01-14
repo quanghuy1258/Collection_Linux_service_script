@@ -12,7 +12,7 @@ routing:
 			echo "Error: Please run as root";                                               \
 			exit;                                                                           \
 		fi;                                                                                 \
-		if [ -z $(IFACE) ]; then                                                            \
+		if [ -z "$(IFACE)" ]; then                                                          \
 			echo "Error: IFACE arg is not set";                                             \
 			exit;                                                                           \
 		fi;                                                                                 \

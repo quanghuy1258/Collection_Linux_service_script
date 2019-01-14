@@ -10,7 +10,7 @@ fi;
 OS_ID=$(cat /etc/os-release | grep "^ID=" | cut -c 4-);
 
 if [ "$OS_ID" = "ubuntu" ]; then
-	if [ ! -f /var/www/html/squirrelmail/configure ]; then
+	if [ ! -f "/var/www/html/squirrelmail/configure" ]; then
 		echo "Error: Install squirrelmail first";
 		exit 1;
 	fi;
