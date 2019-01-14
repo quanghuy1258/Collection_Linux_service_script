@@ -191,7 +191,7 @@ routing_firewall:
 			echo "Error: File firewall.sh not found";                                                          \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -z "$$(shasum $(PATH_PWD)/firewall.sh | grep 8341255f50abaa96ad4bbd1d850f860c95388298)" ]; then \
+		if [ ! -z "$$(shasum $(PATH_PWD)/firewall.sh | grep 69d4688817c70dc56dab3b6656aa44d34f574c7a)" ]; then \
 			echo "Error: Please modify firewall.sh file";                                                      \
 			exit;                                                                                              \
 		fi;                                                                                                    \
