@@ -58,27 +58,27 @@ configure:
 			echo "Error: Please run as root";                                                                  \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/ca.crt ]; then                                                                   \
+		if [ ! -f "$(PATH_PWD)/ca.crt" ]; then                                                                 \
 			echo "Error: File ca.crt not found";                                                               \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ -z $(CLIENT) ]; then                                                                              \
+		if [ -z "$(CLIENT)" ]; then                                                                            \
 			echo "Error: CLIENT arg is not set";                                                               \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/$(CLIENT).crt ]; then                                                            \
+		if [ ! -f "$(PATH_PWD)/$(CLIENT).crt" ]; then                                                          \
 			echo "Error: File $(CLIENT).crt not found";                                                        \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/$(CLIENT).key ]; then                                                            \
+		if [ ! -f "$(PATH_PWD)/$(CLIENT).key" ]; then                                                          \
 			echo "Error: File $(CLIENT).key not found";                                                        \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/ta.key ]; then                                                                   \
+		if [ ! -f "$(PATH_PWD)/ta.key" ]; then                                                                 \
 			echo "Error: File ta.key not found";                                                               \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/client.conf ]; then                                                              \
+		if [ ! -f "$(PATH_PWD)/client.conf" ]; then                                                            \
 			echo "Error: File client.conf not found";                                                          \
 			exit;                                                                                              \
 		fi;                                                                                                    \

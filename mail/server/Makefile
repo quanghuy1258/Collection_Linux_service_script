@@ -160,7 +160,7 @@ configure_filtering:
 			cp $(PATH_PWD)/amavisd-new/50-user /etc/amavis/conf.d/50-user;                                                 \
 			postconf -e 'content_filter = smtp-amavis:[127.0.0.1]:10024';                                                  \
 			if [ -z "$$(cat /etc/postfix/master.cf | grep " Configured: configure_filtering")" ]; then                     \
-				if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/amavisd-new/master.cf.bak ]; then                   \
+				if [ -f "/etc/postfix/master.cf" ] && [ ! -f "$(PATH_PWD)/amavisd-new/master.cf.bak" ]; then               \
 					cp /etc/postfix/master.cf $(PATH_PWD)/amavisd-new/master.cf.bak;                                       \
 				fi;                                                                                                        \
 				rm /etc/postfix/master.cf;                                                                                 \
@@ -188,19 +188,19 @@ configure_ssl:
 			echo "Error: Please run as root";                                                                                           \
 			exit;                                                                                                                       \
 		fi;                                                                                                                             \
-		if [ -z $(MYHOSTNAME) ]; then                                                                                                   \
+		if [ -z "$(MYHOSTNAME)" ]; then                                                                                                 \
 			echo "Error: MYHOSTNAME arg is not set";                                                                                    \
 			exit;                                                                                                                       \
 		fi;                                                                                                                             \
-		if [ ! -f $(PATH_PWD)/ssl/$(MYHOSTNAME).key ]; then                                                                             \
+		if [ ! -f "$(PATH_PWD)/ssl/$(MYHOSTNAME).key" ]; then                                                                           \
 			echo "Error: File ssl/$(MYHOSTNAME).key not found";                                                                         \
 			exit;                                                                                                                       \
 		fi;                                                                                                                             \
-		if [ ! -f $(PATH_PWD)/ssl/$(MYHOSTNAME).crt ]; then                                                                             \
+		if [ ! -f "$(PATH_PWD)/ssl/$(MYHOSTNAME).crt" ]; then                                                                           \
 			echo "Error: File ssl/$(MYHOSTNAME).crt not found";                                                                         \
 			exit;                                                                                                                       \
 		fi;                                                                                                                             \
-		if [ ! -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                                    \
+		if [ ! -f "$(PATH_PWD)/ssl/cacert.pem" ]; then                                                                                  \
 			echo "Warning: File ssl/cacert.pem not found";                                                                              \
 		fi;                                                                                                                             \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                              \
@@ -208,10 +208,10 @@ configure_ssl:
 			echo "Info: Init";                                                                                                          \
 			cp $(PATH_PWD)/ssl/$(MYHOSTNAME).key /etc/ssl/private/$(MYHOSTNAME).key;                                                    \
 			cp $(PATH_PWD)/ssl/$(MYHOSTNAME).crt /etc/ssl/certs/$(MYHOSTNAME).crt;                                                      \
-			if [ -f $(PATH_PWD)/ssl/cacert.pem ]; then                                                                                  \
+			if [ -f "$(PATH_PWD)/ssl/cacert.pem" ]; then                                                                                \
 				cp $(PATH_PWD)/ssl/cacert.pem /etc/ssl/certs/cacert.pem;                                                                \
 			else                                                                                                                        \
-				if [ ! -f /etc/ssl/certs/cacert.pem ]; then                                                                             \
+				if [ ! -f "/etc/ssl/certs/cacert.pem" ]; then                                                                           \
 					echo "Error: File /etc/ssl/certs/cacert.pem not found";                                                             \
 					exit;                                                                                                               \
 				fi;                                                                                                                     \
@@ -239,8 +239,8 @@ configure_ssl:
 			postconf -e 'myhostname = $(MYHOSTNAME)';                                                                                   \
 			postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem';                                                                 \
 			echo "Info: Configure SASL";                                                                                                \
-			if [ -z $$(cat /etc/dovecot/conf.d/10-master.conf | grep -E " Configured: configure_ssl") ]; then                           \
-				if [ -f /etc/dovecot/conf.d/10-master.conf ] && [ ! -f $(PATH_PWD)/ssl/10-master.conf.bak ]; then                       \
+			if [ -z "$$(cat /etc/dovecot/conf.d/10-master.conf | grep -E " Configured: configure_ssl")" ]; then                         \
+				if [ -f "/etc/dovecot/conf.d/10-master.conf" ] && [ ! -f "$(PATH_PWD)/ssl/10-master.conf.bak" ]; then                   \
 					cp /etc/dovecot/conf.d/10-master.conf $(PATH_PWD)/ssl/10-master.conf.bak;                                           \
 				fi;                                                                                                                     \
 				rm -rf /etc/dovecot/conf.d/10-master.conf;                                                                              \
@@ -253,8 +253,8 @@ configure_ssl:
 				done <$(PATH_PWD)/ssl/10-master.conf.bak;                                                                               \
 				printf "%s\n" "# Configured: configure_ssl" >>/etc/dovecot/conf.d/10-master.conf;                                       \
 			fi;                                                                                                                         \
-			if [ -z $$(cat /etc/dovecot/conf.d/10-auth.conf | grep -E " Configured: configure_ssl") ]; then                             \
-				if [ -f /etc/dovecot/conf.d/10-auth.conf ] && [ ! -f $(PATH_PWD)/ssl/10-auth.conf.bak ]; then                           \
+			if [ -z "$$(cat /etc/dovecot/conf.d/10-auth.conf | grep -E " Configured: configure_ssl")" ]; then                           \
+				if [ -f "/etc/dovecot/conf.d/10-auth.conf" ] && [ ! -f "$(PATH_PWD)/ssl/10-auth.conf.bak" ]; then                       \
 					cp /etc/dovecot/conf.d/10-auth.conf $(PATH_PWD)/ssl/10-auth.conf.bak;                                               \
 				fi;                                                                                                                     \
 				rm -rf /etc/dovecot/conf.d/10-auth.conf;                                                                                \
@@ -270,14 +270,14 @@ configure_ssl:
 			fi;                                                                                                                         \
 			echo "Info: Configure smtps";                                                                                               \
 			if [ -z "$$(cat /etc/postfix/master.cf | grep " Configured: configure_ssl")" ]; then                                        \
-				if [ -f /etc/postfix/master.cf ] && [ ! -f $(PATH_PWD)/ssl/master.cf.bak ]; then                                        \
+				if [ -f "/etc/postfix/master.cf" ] && [ ! -f "$(PATH_PWD)/ssl/master.cf.bak" ]; then                                    \
 					cp /etc/postfix/master.cf $(PATH_PWD)/ssl/master.cf.bak;                                                            \
 				fi;                                                                                                                     \
 				cat $(PATH_PWD)/ssl/master.cf >>/etc/postfix/master.cf;                                                                 \
 				printf "%s\n" "# Configured: configure_filtering" >>/etc/postfix/master.cf;                                             \
 			fi;                                                                                                                         \
 			echo "Info: Configure Dovecot SSL";                                                                                         \
-			if [ -f /etc/dovecot/conf.d/10-ssl.conf ] && [ ! -f $(PATH_PWD)/ssl/10-ssl.conf.bak ]; then                                 \
+			if [ -f "/etc/dovecot/conf.d/10-ssl.conf" ] && [ ! -f "$(PATH_PWD)/ssl/10-ssl.conf.bak" ]; then                             \
 				cp /etc/dovecot/conf.d/10-ssl.conf $(PATH_PWD)/ssl/10-ssl.conf.bak;                                                     \
 			fi;                                                                                                                         \
 			rm -rf /etc/dovecot/conf.d/10-ssl.conf;                                                                                     \

@@ -62,7 +62,7 @@ configure:
 			exit;                                                                                                \
 		fi;                                                                                                      \
 		VAR_ZONE=$$(echo "$(ZONE)" | sed -r "s/\.+/./g" | sed -r "s/^\.//" | sed -r "s/\.$$//");                 \
-		if [ ! -f $(PATH_PWD)/named.conf.$$VAR_ZONE ]; then                                                      \
+		if [ ! -f "$(PATH_PWD)/named.conf.$$VAR_ZONE" ]; then                                                    \
 			echo "Error: File named.conf.$$VAR_ZONE not found";                                                  \
 			exit;                                                                                                \
 		fi;                                                                                                      \
@@ -74,7 +74,7 @@ configure:
 			echo "Error: File named.conf.$$VAR_ZONE --> Syntax error: file";                                     \
 			exit;                                                                                                \
 		fi;                                                                                                      \
-		if [ ! -f $(PATH_PWD)/db.$$VAR_ZONE ]; then                                                              \
+		if [ ! -f "$(PATH_PWD)/db.$$VAR_ZONE" ]; then                                                            \
 			echo "Error: File db.$$VAR_ZONE not found";                                                          \
 			exit;                                                                                                \
 		fi;                                                                                                      \

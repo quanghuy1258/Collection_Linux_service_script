@@ -5,35 +5,81 @@ OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 help:
 	@	echo "- Show help:                             $$ make help"
 	@	echo "- Install dependencies:              (1) $$ sudo make install"
+	@	echo "- Remove TAP:                            $$ sudo make remove_tap BR=bro TAP=\"tap0 tap1\""
 	@	echo "- Uninstall dependencies:                $$ sudo make uninstall"
 	@	echo "- Init configure:                    (2) $$ sudo make init"
 	@	echo "- Create server cert & key:          (3) $$ sudo make server"
 	@	echo "- Configure routing & firewall:      (4) $$ sudo make routing_firewall"
+	@	echo "- Add TAP:                               $$ sudo make add_tap BR=br0 TAP=\"tap0 tap1\" ETH=eth0 ETH_IP=192.168.8.4 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.8.255"
 	@	echo "- Add server config & start service: (5) $$ sudo make start"
 	@	echo "- Create client cert & key:              $$ sudo make client CLIENT={string}"
 	@	echo "RECOMMEND: (1) -> (2) -> (3) -> (4) -> (5)"
 
 install:
-	@	if [ $$(id -u) -ne 0 ]; then                                       \
-			echo "Error: Please run as root";                              \
-			exit;                                                          \
-		fi;                                                                \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                 \
-			if [ -z "$$(apt list --installed | grep "^openvpn/")" ]; then  \
-				echo "===== Install openvpn =====";                        \
-				apt-get -y install openvpn;                                \
-			fi;                                                            \
-			if [ -z "$$(apt list --installed | grep "^easy-rsa/")" ]; then \
-				echo "===== Install easy-rsa =====";                       \
-				apt-get -y install easy-rsa;                               \
-			fi;                                                            \
-			echo "===== Done =====";                                       \
-			exit;                                                          \
-		fi;                                                                \
-		if [ -z "$(OS_ID)" ]; then                                         \
-			echo "Error: OS not supported";                                \
-		else                                                               \
-			echo "Error: $(OS_ID) OS not supported";                       \
+	@	if [ $$(id -u) -ne 0 ]; then                                           \
+			echo "Error: Please run as root";                                  \
+			exit;                                                              \
+		fi;                                                                    \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                     \
+			if [ -z "$$(apt list --installed | grep "^openvpn/")" ]; then      \
+				echo "===== Install openvpn =====";                            \
+				apt-get -y install openvpn;                                    \
+			fi;                                                                \
+			if [ -z "$$(apt list --installed | grep "^easy-rsa/")" ]; then     \
+				echo "===== Install easy-rsa =====";                           \
+				apt-get -y install easy-rsa;                                   \
+			fi;                                                                \
+			if [ -z "$$(apt list --installed | grep "^bridge-utils/")" ]; then \
+				echo "===== Install bridge-utils =====";                       \
+				apt-get -y install bridge-utils;                               \
+			fi;                                                                \
+			echo "===== Done =====";                                           \
+			exit;                                                              \
+		fi;                                                                    \
+		if [ -z "$(OS_ID)" ]; then                                             \
+			echo "Error: OS not supported";                                    \
+		else                                                                   \
+			echo "Error: $(OS_ID) OS not supported";                           \
+		fi;
+
+remove_tap:
+	@	if [ $$(id -u) -ne 0 ]; then                                          \
+			echo "Error: Please run as root";                                 \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z "$(BR)" ]; then                                               \
+			echo "Error: BR arg is not set";                                  \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z "$(TAP)" ]; then                                              \
+			echo "Error: TAP arg is not set";                                 \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ ! -f "$(PATH_PWD)/bridge-stop.bak" ]; then                       \
+			if [ ! -f "$(PATH_PWD)/bridge-stop" ]; then                       \
+				echo "Error: File bridge-stop not found";                     \
+				exit;                                                         \
+			fi;                                                               \
+			cp $(PATH_PWD)/bridge-stop $(PATH_PWD)/bridge-stop.bak;           \
+		fi;                                                                   \
+		cat $(PATH_PWD)/bridge-stop.bak >$(PATH_PWD)/bridge-stop;             \
+		echo "Check your args: BR=$(BR), TAP=$(TAP)";                         \
+		echo "Warning: Example -> BR=bro TAP=\"tap0 tap1\"";                  \
+		read -r -p "Continue? [y/N] " response;                               \
+		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                    \
+			sed -re "s/br0/$(BR)/g" -i $(PATH_PWD)/bridge-stop;               \
+			sed -re "s/tap0/$(TAP)/g" -i $(PATH_PWD)/bridge-stop;             \
+			$(PATH_PWD)/bridge-stop;                                          \
+			echo "===== Done =====";                                          \
+			exit;                                                             \
+		fi;                                                                   \
+		if [ -z "$(OS_ID)" ]; then                                            \
+			echo "Error: OS not supported";                                   \
+		else                                                                  \
+			echo "Error: $(OS_ID) OS not supported";                          \
 		fi;
 
 uninstall:
@@ -130,7 +176,7 @@ routing_firewall:
 			echo "Error: Please run as root";                                                                  \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/routing.sh ]; then                                                               \
+		if [ ! -f "$(PATH_PWD)/routing.sh" ]; then                                                             \
 			echo "Error: File routing.sh not found";                                                           \
 			exit;                                                                                              \
 		fi;                                                                                                    \
@@ -141,11 +187,11 @@ routing_firewall:
 				exit;                                                                                          \
 			fi;                                                                                                \
 		fi;                                                                                                    \
-		if [ ! -f $(PATH_PWD)/firewall.sh ]; then                                                              \
+		if [ ! -f "$(PATH_PWD)/firewall.sh" ]; then                                                            \
 			echo "Error: File firewall.sh not found";                                                          \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -z "$$(shasum $(PATH_PWD)/firewall.sh | grep 8341255f50abaa96ad4bbd1d850f860c95388298)" ]; then \
+		if [ ! -z "$$(shasum $(PATH_PWD)/firewall.sh | grep 69d4688817c70dc56dab3b6656aa44d34f574c7a)" ]; then \
 			echo "Error: Please modify firewall.sh file";                                                      \
 			exit;                                                                                              \
 		fi;                                                                                                    \
@@ -159,6 +205,66 @@ routing_firewall:
 			echo "Error: OS not supported";                                                                    \
 		else                                                                                                   \
 			echo "Error: $(OS_ID) OS not supported";                                                           \
+		fi;
+
+add_tap:
+	@	if [ $$(id -u) -ne 0 ]; then                                                                                                         \
+			echo "Error: Please run as root";                                                                                                \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(BR)" ]; then                                                                                                              \
+			echo "Error: BR arg is not set";                                                                                                 \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(TAP)" ]; then                                                                                                             \
+			echo "Error: TAP arg is not set";                                                                                                \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(ETH)" ]; then                                                                                                             \
+			echo "Error: ETH arg is not set";                                                                                                \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(ETH_IP)" ]; then                                                                                                          \
+			echo "Error: ETH_IP arg is not set";                                                                                             \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(ETH_NETMASK)" ]; then                                                                                                     \
+			echo "Error: ETH_NETMASK arg is not set";                                                                                        \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(ETH_BROADCAST)" ]; then                                                                                                   \
+			echo "Error: ETH_BROADCAST arg is not set";                                                                                      \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ ! -f "$(PATH_PWD)/bridge-start.bak" ]; then                                                                                     \
+			if [ ! "-f $(PATH_PWD)/bridge-start" ]; then                                                                                     \
+				echo "Error: File bridge-start not found";                                                                                   \
+				exit;                                                                                                                        \
+			fi;                                                                                                                              \
+			cp $(PATH_PWD)/bridge-start $(PATH_PWD)/bridge-start.bak;                                                                        \
+		fi;                                                                                                                                  \
+		cat $(PATH_PWD)/bridge-start.bak >$(PATH_PWD)/bridge-start;                                                                          \
+		echo "Check your args: BR=$(BR), TAP=$(TAP) ETH=$(ETH) ETH_IP=$(ETH_IP) ETH_NETMASK=$(ETH_NETMASK) ETH_BROADCAST=$(ETH_BROADCAST)";  \
+		echo "Warning: Example -> BR=br0 TAP="tap0 tap1" ETH=eth0 ETH_IP=192.168.8.4 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.8.255"; \
+		read -r -p "Continue? [y/N] " response;                                                                                              \
+		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                                                \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                                   \
+			sed -re "s/br0/$(BR)/g" -i $(PATH_PWD)/bridge-start;                                                                             \
+			sed -re "s/tap0/$(TAP)/g" -i $(PATH_PWD)/bridge-start;                                                                           \
+			sed -re "s/eth0/$(ETH)/g" -i $(PATH_PWD)/bridge-start;                                                                           \
+			sed -re "s/192.168.8.4/$(ETH_IP)/g" -i $(PATH_PWD)/bridge-start;                                                                 \
+			sed -re "s/255.255.255.0/$(ETH_NETMASK)/g" -i $(PATH_PWD)/bridge-start;                                                          \
+			sed -re "s/192.168.8.255/$(ETH_BROADCAST)/g" -i $(PATH_PWD)/bridge-start;                                                        \
+			$(PATH_PWD)/bridge-start;                                                                                                        \
+			echo "===== Done =====";                                                                                                         \
+			exit;                                                                                                                            \
+		fi;                                                                                                                                  \
+		if [ -z "$(OS_ID)" ]; then                                                                                                           \
+			echo "Error: OS not supported";                                                                                                  \
+		else                                                                                                                                 \
+			echo "Error: $(OS_ID) OS not supported";                                                                                         \
 		fi;
 
 start:
@@ -196,7 +302,7 @@ client:
 			echo "Error: Please run as root";                        \
 			exit;                                                    \
 		fi;                                                          \
-		if [ -z $(CLIENT) ]; then                                    \
+		if [ -z "$(CLIENT)" ]; then                                  \
 			echo "Error: CLIENT arg is not set";                     \
 			exit;                                                    \
 		fi;                                                          \

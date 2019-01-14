@@ -41,7 +41,7 @@ static:
 				echo "===== Install ifupdown =====";                                                                      \
 				apt-get -y install ifupdown;                                                                              \
 			fi;                                                                                                           \
-			if [ ! -f $(PATH_PWD)/interfaces.bak ]; then                                                                  \
+			if [ ! -f "$(PATH_PWD)/interfaces.bak" ]; then                                                                \
 				cp /etc/network/interfaces $(PATH_PWD)/interfaces.bak;                                                    \
 			fi;                                                                                                           \
 			rm -rf /etc/network/interfaces;                                                                               \
