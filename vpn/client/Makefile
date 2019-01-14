@@ -112,25 +112,6 @@ configure:
 			echo "Error: $(OS_ID) OS not supported";                                                           \
 		fi;
 
-dhcp:
-	@	if [ $$(id -u) -ne 0 ]; then                                      \
-			echo "Error: Please run as root";                             \
-			exit;                                                         \
-		fi;                                                               \
-		if [ -z "$$(echo -n $(IFACE) | grep "^tap")" ]; then              \
-			echo "Error: IFACE arg is not set or Wrong config";           \
-			exit;                                                         \
-		fi;                                                               \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                \
-			echo "===== Done =====";                                      \
-			exit;                                                         \
-		fi;                                                               \
-		if [ -z "$(OS_ID)" ]; then                                        \
-			echo "Error: OS not supported";                               \
-		else                                                              \
-			echo "Error: $(OS_ID) OS not supported";                      \
-		fi;
-
 start:
 	@	if [ $$(id -u) -ne 0 ]; then                                                       \
 			echo "Error: Please run as root";                                              \
@@ -151,6 +132,26 @@ start:
 			echo "Error: OS not supported";                                                \
 		else                                                                               \
 			echo "Error: $(OS_ID) OS not supported";                                       \
+		fi;
+
+dhcp:
+	@	if [ $$(id -u) -ne 0 ]; then                                      \
+			echo "Error: Please run as root";                             \
+			exit;                                                         \
+		fi;                                                               \
+		if [ -z "$$(echo -n $(IFACE) | grep "^tap")" ]; then              \
+			echo "Error: IFACE arg is not set or Wrong config";           \
+			exit;                                                         \
+		fi;                                                               \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                \
+			dhclient $(IFACE);                                            \
+			echo "===== Done =====";                                      \
+			exit;                                                         \
+		fi;                                                               \
+		if [ -z "$(OS_ID)" ]; then                                        \
+			echo "Error: OS not supported";                               \
+		else                                                              \
+			echo "Error: $(OS_ID) OS not supported";                      \
 		fi;
 
 stop:
