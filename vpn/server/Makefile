@@ -5,7 +5,7 @@ OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 help:
 	@	echo "- Show help:                             $$ make help"
 	@	echo "- Install dependencies:              (1) $$ sudo make install"
-	@	echo "- Remove TAP:                            $$ sudo make remove_tap BR=bro TAP=\"tap0 tap1\""
+	@	echo "- Remove TAP:                            $$ sudo make remove_tap BR=br0 TAP=\"tap0 tap1\""
 	@	echo "- Uninstall dependencies:                $$ sudo make uninstall"
 	@	echo "- Init configure:                    (2) $$ sudo make init"
 	@	echo "- Create server cert & key:          (3) $$ sudo make server"
@@ -64,7 +64,7 @@ remove_tap:
 		fi;                                                                   \
 		cat $(PATH_PWD)/bridge-stop.bak >$(PATH_PWD)/bridge-stop;             \
 		echo "Check your args: BR=$(BR), TAP=$(TAP)";                         \
-		echo "Warning: Example -> BR=bro TAP=\"tap0 tap1\"";                  \
+		echo "Warning: Example -> BR=br0 TAP=\"tap0 tap1\"";                  \
 		read -r -p "Continue? [y/N] " response;                               \
 		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then \
 			exit;                                                             \
