@@ -40,19 +40,26 @@ iptables -P INPUT DROP;
 iptables -P FORWARD DROP;
 
 # Allow local loopback
-iptables -A INPUT -s 127.0.0.0/8 -j ACCEPT;
-iptables -A INPUT -d 127.0.0.0/8 -j ACCEPT;
+iptables -A INPUT -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT;
 
 # Allow incoming pings
-iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT;
-iptables -A INPUT -p icmp --icmp-type echo-reply   -j ACCEPT;
+iptables -A INPUT -i $PUBLIC_IFACE   -p icmp -d 10.10.231.1   -j ACCEPT;
+iptables -A INPUT -i $DMZ_IFACE      -p icmp -d 172.16.231.1  -j ACCEPT;
+iptables -A INPUT -i $INTERNAL_IFACE -p icmp -d 192.168.231.1 -j ACCEPT;
 
-# Allow firewall can connect to another host
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;
+# Allow established and related packet
+iptables -A INPUT   -m state --state ESTABLISHED,RELATED -j ACCEPT;
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT;
+
+# Allow forward DMZ and Internal to Public
+iptables -A FORWARD -i $DMZ_IFACE      -o $PUBLIC_IFACE -j ACCEPT;
+iptables -A FORWARD -i $INTERNAL_IFACE -o $PUBLIC_IFACE -j ACCEPT;
+
+# Allow forward Internal to DMZ
+iptables -A FORWARD -i $INTERNAL_IFACE -o $DMZ_IFACE    -j ACCEPT;
 
 # Allow services
 # DMZ
-iptables -A FORWARD -i $DMZ_IFACE -o $PUBLIC_IFACE -s 172.16.231.0/24 -j ACCEPT;
 iptables -t nat -A PREROUTING -p tcp --dport 80  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:80;
 iptables -t nat -A PREROUTING -p tcp --dport 443 -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:443;
 iptables -t nat -A PREROUTING -p tcp --dport 25  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:25;
@@ -63,25 +70,20 @@ iptables -t nat -A PREROUTING -p tcp --dport 993 -i $PUBLIC_IFACE -j DNAT --to-d
 iptables -t nat -A PREROUTING -p tcp --dport 995 -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:995;
 iptables -t nat -A PREROUTING -p tcp --dport 20  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:20;
 iptables -t nat -A PREROUTING -p tcp --dport 21  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:21;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 80  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 443 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 25  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 110 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 143 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 465 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 993 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 995 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 20  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp --dport 21  -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 80  -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 443 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 25  -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 110 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 143 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 465 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 993 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 995 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 20  -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 21  -j ACCEPT;
 # Internal network
-iptables -A FORWARD -i $INTERNAL_IFACE -o $PUBLIC_IFACE -s 192.168.231.0/24 -j ACCEPT;
 iptables -t nat -A PREROUTING -p tcp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -t nat -A PREROUTING -p udp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $INTERNAL_IFACE -p tcp --dport 53 -j ACCEPT;
-
-# DMZ and Internal network
-iptables -A FORWARD -i $DMZ_IFACE -o $INTERNAL_IFACE -s 172.16.231.0/24  -j ACCEPT;
-iptables -A FORWARD -i $INTERNAL_IFACE -o $DMZ_IFACE -s 192.168.231.0/24 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o $INTERNAL_IFACE -p tcp -d 172.16.231.251 --dport 53 -j ACCEPT;
 
 cd routing/;
 make routing IFACE=$PUBLIC_IFACE;
