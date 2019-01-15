@@ -80,6 +80,7 @@ configure:
 				cp /etc/squid/squid.conf $(PATH_PWD)/squid.conf.bak;                                                     \
 			fi;                                                                                                          \
 			cp $(PATH_PWD)/squid.conf.bak /etc/squid/squid.conf;                                                         \
+			sed -i "s/^http_access deny/http_access allow/g" /etc/squid/squid.conf;                                      \
 			if [ -z "$$(cat /etc/squid/squid.conf | grep "acl bad_sites dstdomain \"/etc/squid/badsites.acl\"")" ]; then \
 				sed -i "1i\acl bad_sites dstdomain \"\/etc\/squid\/badsites.acl\"" /etc/squid/squid.conf;                \
 			fi;                                                                                                          \
