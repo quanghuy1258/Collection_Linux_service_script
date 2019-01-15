@@ -180,7 +180,7 @@ routing_firewall:
 			echo "Error: File routing.sh not found";                                                           \
 			exit;                                                                                              \
 		fi;                                                                                                    \
-		if [ ! -z "$$(shasum $(PATH_PWD)/routing.sh | grep 57f7ce2160ee53741f70a06b8711fc4ad5b2608c)" ]; then  \
+		if [ ! -z "$$(shasum $(PATH_PWD)/routing.sh | grep 14ff6c74f507499538488afd80f6b7092d601b7d)" ]; then  \
 			echo "Warning: Please modify routing.sh file";                                                     \
 			read -r -p "Continue? [y/N] " response;                                                            \
 			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                              \
