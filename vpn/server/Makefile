@@ -279,6 +279,31 @@ start:
 				exit;                                                                                          \
 			fi;                                                                                                \
 		fi;                                                                                                    \
+		if [ ! -z "$$(cat $(PATH_PWD)/server.conf | grep -E "^dev tap")" ]; then                               \
+			if [ -z "$$(cat $(PATH_PWD)/server.conf | grep -E "^server-bridge nogw")" ]; then                  \
+				echo "REMEMBER:";                                                                              \
+				echo "server-bridge gateway netmask pool-start-IP pool-end-IP = {";                            \
+				echo "    mode server";                                                                        \
+				echo "    tls-server";                                                                         \
+				echo "    ifconfig-pool pool-start-IP pool-end-IP netmask";                                    \
+				echo "    push \"route-gateway gateway\"";                                                     \
+				echo "}";                                                                                      \
+				echo "server-bridge = {";                                                                      \
+				echo "    mode server";                                                                        \
+				echo "    tls-server";                                                                         \
+				echo "    push \"route-gateway dhcp\""   ;                                                     \
+				echo "}";                                                                                      \
+				echo "server-bridge nogw = {";                                                                 \
+				echo "    mode server";                                                                        \
+				echo "    tls-server";                                                                         \
+				echo "}";                                                                                      \
+				echo "TIP: If having problem with server-bridge mode, try server-bridge nogw";                 \
+				read -r -p "Continue? [y/N] " response;                                                        \
+				if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                          \
+					exit;                                                                                      \
+				fi;                                                                                            \
+			fi;                                                                                                \
+		fi;                                                                                                    \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                     \
 			cp $(PATH_PWD)/server.conf /etc/openvpn/;                                                          \
 			if [ -z "$$(systemctl status openvpn@server | grep "Active: active ")" ]; then                     \
