@@ -57,25 +57,25 @@ configure:
 			echo "Error: Please run as root";                                                                            \
 			exit;                                                                                                        \
 		fi;                                                                                                              \
-		if [ ! -f "$(PATH_PWD)/badsite.acl" ]; then                                                                      \
-			echo "Error: File badsite.acl is not found";                                                                 \
+		if [ ! -f "$(PATH_PWD)/badsites.acl" ]; then                                                                     \
+			echo "Error: File badsites.acl is not found";                                                                \
 			exit;                                                                                                        \
 		fi;                                                                                                              \
-		if [ -z "$$(cat $(PATH_PWD)/badsite.acl)" ]; then                                                                \
-			echo "Warning: File badsite.acl is empty";                                                                   \
+		if [ -z "$$(cat $(PATH_PWD)/badsites.acl)" ]; then                                                               \
+			echo "Warning: File badsites.acl is empty";                                                                  \
 			read -r -p "Continue? [y/N] " response;                                                                      \
 			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                        \
 				exit;                                                                                                    \
 			fi;                                                                                                          \
 		fi;                                                                                                              \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                               \
-			if [ -f "/etc/squid/badsite.acl" ] && [ ! -f "$(PATH_PWD)/badsite.acl.bak" ]; then                           \
-				cp /etc/squid/badsite.acl $(PATH_PWD)/badsite.acl.bak;                                                   \
+			if [ -f "/etc/squid/badsites.acl" ] && [ ! -f "$(PATH_PWD)/badsites.acl.bak" ]; then                         \
+				cp /etc/squid/badsites.acl $(PATH_PWD)/badsites.acl.bak;                                                 \
 			fi;                                                                                                          \
-			if [ -f "$(PATH_PWD)/badsite.acl.bak" ]; then                                                                \
-				cp $(PATH_PWD)/badsite.acl.bak /etc/squid/badsite.acl;                                                   \
+			if [ -f "$(PATH_PWD)/badsites.acl.bak" ]; then                                                               \
+				cp $(PATH_PWD)/badsites.acl.bak /etc/squid/badsites.acl;                                                 \
 			fi;                                                                                                          \
-			cat $(PATH_PWD)/badsite.acl >>/etc/squid/badsite.acl;                                                        \
+			cat $(PATH_PWD)/badsites.acl >>/etc/squid/badsites.acl;                                                      \
 			if [ ! -f "$(PATH_PWD)/squid.conf.bak" ]; then                                                               \
 				cp /etc/squid/squid.conf $(PATH_PWD)/squid.conf.bak;                                                     \
 			fi;                                                                                                          \
