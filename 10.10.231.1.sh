@@ -22,10 +22,13 @@ make static IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0;
 make static IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0;
 cd ../;
 
-read -n1 -r -p "Press any key to continue..." key;
 echo "===== Set static ip: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
 
 echo 1 > /proc/sys/net/ipv4/ip_forward;
+
+echo "===== Enable ip forward: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
 
 # Delete old iptables rules
 # and temporarily block all traffic.
@@ -58,6 +61,29 @@ iptables -A FORWARD -i $INTERNAL_IFACE -o $PUBLIC_IFACE -j ACCEPT;
 # Allow forward Internal to DMZ
 iptables -A FORWARD -i $INTERNAL_IFACE -o $DMZ_IFACE    -j ACCEPT;
 
+echo "===== Basic firewall: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
+cd vpn/server;
+make install;
+read -n1 -r -p "Press any key to continue..." key;
+make init;
+read -n1 -r -p "Press any key to continue..." key;
+make server;
+read -n1 -r -p "Press any key to continue..." key;
+sed -re "s/INTERNET_INTERFACE=.*/INTERNET_INTERFACE=$INTERNAL_IFACE/g" -i 10.10.231.1.firewall.sh;
+cp 10.10.231.1.firewall.sh firewall.sh;
+make routing_firewall;
+read -n1 -r -p "Press any key to continue..." key;
+make add_tap BR=br0 TAP=tap0 ETH=$INTERNAL_IFACE ETH_IP=192.168.231.1 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.231.255
+read -n1 -r -p "Press any key to continue..." key;
+cp 10.10.231.1.server.conf server.conf;
+make start;
+cd ../../;
+
+echo "===== VPN: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
 # Allow services
 # DMZ
 iptables -t nat -A PREROUTING -p tcp --dport 80  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:80;
@@ -85,9 +111,12 @@ iptables -t nat -A PREROUTING -p tcp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-d
 iptables -t nat -A PREROUTING -p udp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -A FORWARD -i $PUBLIC_IFACE -o $INTERNAL_IFACE -p tcp -d 172.16.231.251 --dport 53 -j ACCEPT;
 
+echo "===== Allow services: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
 cd routing/;
 make routing IFACE=$PUBLIC_IFACE;
 cd ../;
 
-echo "===== Firewall + NAT: Done =====";
+echo "===== NAT: Done =====";
 
