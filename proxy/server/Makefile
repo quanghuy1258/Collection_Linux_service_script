@@ -109,7 +109,7 @@ start:
 			exit;                                                                                    \
 		fi;                                                                                          \
 		if [ -z "$(IFACE)" ]; then                                                                   \
-			echo "Error: BR arg is not set";                                                         \
+			echo "Error: IFACE arg is not set";                                                      \
 			exit;                                                                                    \
 		fi;                                                                                          \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                           \
