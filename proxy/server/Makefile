@@ -57,6 +57,17 @@ configure:
 			echo "Error: Please run as root";                                                                            \
 			exit;                                                                                                        \
 		fi;                                                                                                              \
+		if [ ! -f "$(PATH_PWD)/badsite.acl" ]; then                                                                      \
+			echo "Error: File badsite.acl is not found";                                                                 \
+			exit;                                                                                                        \
+		fi;                                                                                                              \
+		if [ -z "$$(cat $(PATH_PWD)/badsite.acl)" ]; then                                                                \
+			echo "Warning: File badsite.acl is empty";                                                                   \
+			read -r -p "Continue? [y/N] " response;                                                                      \
+			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                        \
+				exit;                                                                                                    \
+			fi;                                                                                                          \
+		fi;                                                                                                              \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                               \
 			if [ -f "/etc/squid/badsite.acl" ]; && [ ! -f "$(PATH_PWD)/badsite.acl.bak" ]; then                          \
 				cp /etc/squid/badsite.acl $(PATH_PWD)/badsite.acl.bak;                                                   \
