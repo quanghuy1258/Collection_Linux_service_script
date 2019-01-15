@@ -69,7 +69,7 @@ configure:
 			fi;                                                                                                          \
 		fi;                                                                                                              \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                               \
-			if [ -f "/etc/squid/badsite.acl" ]; && [ ! -f "$(PATH_PWD)/badsite.acl.bak" ]; then                          \
+			if [ -f "/etc/squid/badsite.acl" ] && [ ! -f "$(PATH_PWD)/badsite.acl.bak" ]; then                           \
 				cp /etc/squid/badsite.acl $(PATH_PWD)/badsite.acl.bak;                                                   \
 			fi;                                                                                                          \
 			if [ -f "$(PATH_PWD)/badsite.acl.bak" ]; then                                                                \
