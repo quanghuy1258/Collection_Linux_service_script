@@ -113,6 +113,7 @@ start:
 			exit;                                                                                    \
 		fi;                                                                                          \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                           \
+			echo 1 >/proc/sys/net/ipv4/ip_forward;                                                   \
 			iptables -t nat -A PREROUTING -i $(IFACE) -p tcp --dport 80  -j REDIRECT --to-port 3128; \
 			iptables -t nat -A PREROUTING -i $(IFACE) -p tcp --dport 443 -j REDIRECT --to-port 3128; \
 			if [ -z "$$(systemctl status squid.service | grep "Active: active ")" ]; then            \
