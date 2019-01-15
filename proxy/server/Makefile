@@ -83,15 +83,15 @@ configure:
 			if [ -z "$$(cat /etc/squid/squid.conf | grep "acl bad_sites dstdomain \"/etc/squid/badsites.acl\"")" ]; then \
 				sed -i "1i\acl bad_sites dstdomain \"\/etc\/squid\/badsites.acl\"" /etc/squid/squid.conf;                \
 			fi;                                                                                                          \
-			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_access allow all")" ];                                   \
+			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_access allow all")" ]; then                              \
 				lastline=$$(cat /etc/squid/squid.conf | grep "^http_access" | tail -n 1);                                \
 				sed -i "/$${lastline}/a\http_access allow all" /etc/squid/squid.conf;                                    \
 			fi;                                                                                                          \
-			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_access deny bad_sites")" ];                              \
+			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_access deny bad_sites")" ]; then                         \
 				lastline=$$(cat /etc/squid/squid.conf | grep "^http_access" | tail -n 1);                                \
 				sed -i "/$${lastline}/a\http_access deny bad_sites" /etc/squid/squid.conf;                               \
 			fi;                                                                                                          \
-			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_port 3128 intercept")" ];                                \
+			if [ -z "$$(cat /etc/squid/squid.conf | grep "^http_port 3128 intercept")" ]; then                           \
 				sed -i "/^http_port 3128/c\http_port 3128 intercept" /etc/squid/squid.conf;                              \
 			fi;                                                                                                          \
 			echo "===== Done =====";                                                                                     \
