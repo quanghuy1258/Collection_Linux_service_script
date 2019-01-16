@@ -54,7 +54,7 @@ static:
 				fi;                                                                               \
 				printf "\n" >>/etc/network/interfaces;                                            \
 				ifdown --force $(IFACE);                                                          \
-				ifup $(IFACE);                                                                    \
+				ifup --force $(IFACE);                                                            \
 			else                                                                                  \
 				echo "Error: Already set $(IFACE) interface. Please remove it manually";          \
 				exit;                                                                             \
