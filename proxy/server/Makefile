@@ -68,17 +68,6 @@ configure:
 				exit;                                                                                                              \
 			fi;                                                                                                                    \
 		fi;                                                                                                                        \
-		if [ ! -f "$(PATH_PWD)/bad-https.acl" ]; then                                                                              \
-			echo "Error: File bad-https.acl is not found";                                                                         \
-			exit;                                                                                                                  \
-		fi;                                                                                                                        \
-		if [ -z "$$(cat $(PATH_PWD)/bad-https.acl)" ]; then                                                                        \
-			echo "Warning: File bad-https.acl is empty";                                                                           \
-			read -r -p "Continue? [y/N] " response;                                                                                \
-			if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                                  \
-				exit;                                                                                                              \
-			fi;                                                                                                                    \
-		fi;                                                                                                                        \
 		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                         \
 			etc_dir=/etc/squid;                                                                                                    \
 			if [ -f "$${etc_dir}/bad-http.acl" ] && [ ! -f "$(PATH_PWD)/bad-http.acl.bak" ]; then                                  \
@@ -90,24 +79,10 @@ configure:
 				touch $(PATH_PWD)/bad-http.acl.bak;                                                                                \
 			fi;                                                                                                                    \
 			cat $(PATH_PWD)/bad-http.acl >>$${etc_dir}/bad-http.acl;                                                               \
-			if [ -f "$${etc_dir}/bad-https.acl" ] && [ ! -f "$(PATH_PWD)/bad-https.acl.bak" ]; then                                \
-				cp $${etc_dir}/bad-https.acl $(PATH_PWD)/bad-https.acl.bak;                                                        \
-			fi;                                                                                                                    \
-			if [ -f "$(PATH_PWD)/bad-https.acl.bak" ]; then                                                                        \
-				cp $(PATH_PWD)/bad-https.acl.bak $${etc_dir}/bad-https.acl;                                                        \
-			else                                                                                                                   \
-				touch $(PATH_PWD)/bad-https.acl.bak;                                                                               \
-			fi;                                                                                                                    \
-			cat $(PATH_PWD)/bad-https.acl >>$${etc_dir}/bad-https.acl;                                                             \
 			if [ ! -f "$(PATH_PWD)/squid.conf.bak" ]; then                                                                         \
 				cp $${etc_dir}/squid.conf $(PATH_PWD)/squid.conf.bak;                                                              \
 			fi;                                                                                                                    \
 			cp $(PATH_PWD)/squid.conf.bak $${etc_dir}/squid.conf;                                                                  \
-			if [ -z "$$(cat $${etc_dir}/squid.conf | grep "acl bad_https ssl::server_name \"$${etc_dir}/bad-https.acl\"")" ]; then \
-				echo "acl bad_https ssl::server_name \"$${etc_dir}/bad-https.acl\"" >temp;                                         \
-				cat $${etc_dir}/squid.conf >>temp;                                                                                 \
-				mv temp $${etc_dir}/squid.conf;                                                                                    \
-			fi;                                                                                                                    \
 			if [ -z "$$(cat $${etc_dir}/squid.conf | grep "acl bad_http dstdomain \"$${etc_dir}/bad-http.acl\"")" ]; then          \
 				echo "acl bad_http dstdomain \"$${etc_dir}/bad-http.acl\"" >temp;                                                  \
 				cat $${etc_dir}/squid.conf >>temp;                                                                                 \
