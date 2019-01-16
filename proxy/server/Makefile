@@ -60,7 +60,7 @@ configure:
 		if [ ! -f "$(PATH_PWD)/bad-http.acl" ]; then                                                                               \
 			echo "Error: File bad-http.acl is not found";                                                                          \
 			exit;                                                                                                                  \
-		i;                                                                                                                         \
+		fi;                                                                                                                        \
 		if [ -z "$$(cat $(PATH_PWD)/bad-http.acl)" ]; then                                                                         \
 			echo "Warning: File bad-http.acl is empty";                                                                            \
 			read -r -p "Continue? [y/N] " response;                                                                                \
