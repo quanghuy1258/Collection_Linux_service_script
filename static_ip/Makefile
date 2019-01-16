@@ -3,11 +3,12 @@ PATH_PWD := $(shell pwd)
 OS_ID    := $(shell cat /etc/os-release | grep "^ID=" | cut -c 4-)
 
 help:
-	@	echo "- Show help:         $$ make help"
-	@	echo "- Set static ip: (1) $$ sudo make static IFACE={string} IP={x.x.x.x} NETMASK={x.x.x.x} GATEWAY={x.x.x.x}"
+	@	echo "- Show help:      $$ make help"
+	@	echo "- Set static ip:  $$ sudo make static_ip IFACE={string} IP={x.x.x.x} NETMASK={x.x.x.x} GATEWAY={x.x.x.x}"
+	@	echo "- Set static dns: $$ sudo make static_dns DNS={x.x.x.x}"
 	@	echo "RECOMMEND: (1)"
 
-static:
+static_ip:
 	@	if [ $$(id -u) -ne 0 ]; then                                                              \
 			echo "Error: Please run as root";                                                     \
 			exit;                                                                                 \
@@ -66,4 +67,35 @@ static:
 			echo "Error: OS not supported";                                                       \
 		else                                                                                      \
 			echo "Error: $(OS_ID) OS not supported";                                              \
+		fi;
+
+static_dns:
+	@	if [ $$(id -u) -ne 0 ]; then                                             \
+			echo "Error: Please run as root";                                    \
+			exit;                                                                \
+		fi;                                                                      \
+		if [ -z "$(DNS)" ]; then                                                 \
+			echo "Error: DNS arg is not set";                                    \
+			exit;                                                                \
+		fi;                                                                      \
+		echo "Check your args: DNS=$(DNS)";                                      \
+		echo "Warning: Example -> DNS=x.x.x.x";                                  \
+		read -r -p "Continue? [y/N] " response;                                  \
+		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then    \
+			exit;                                                                \
+		fi;                                                                      \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                       \
+			if [ ! -f "$(PATH_PWD)/resolv.conf.bak" ]; then                      \
+				cp /etc/resolv.conf $(PATH_PWD)/resolv.conf.bak;                 \
+			fi;                                                                  \
+			cat $(PATH_PWD)/resolv.conf.bak >/etc/resolv.conf;                   \
+			firstline=$$(cat /etc/resolv.conf | grep "^nameserver "| head -n 1); \
+			sed -i "/$${firstline}/i\nameserver $(DNS)" /etc/resolv.conf;        \
+			echo "===== Done =====";                                             \
+			exit;                                                                \
+		fi;                                                                      \
+		if [ -z "$(OS_ID)" ]; then                                               \
+			echo "Error: OS not supported";                                      \
+		else                                                                     \
+			echo "Error: $(OS_ID) OS not supported";                             \
 		fi;
