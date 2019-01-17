@@ -23,7 +23,7 @@ echo "===== NAT: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
 
 cd static_ip/;
-make static IFACE=$INTERNAL_IFACE IP=10.10.231.2 NETMASK=255.255.255.0;
+make static_ip IFACE=$INTERNAL_IFACE IP=10.10.231.2 NETMASK=255.255.255.0;
 cd ../;
 
 echo "===== Static IP: Done =====";

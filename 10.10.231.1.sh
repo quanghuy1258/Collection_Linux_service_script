@@ -17,12 +17,45 @@ if [ $(id -u) -ne 0 ]; then
 fi;
 
 cd static_ip/;
-make static IFACE=$PUBLIC_IFACE IP=10.10.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.2 DNS="8.8.8.8 8.8.4.4";
-make static IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0;
-make static IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0;
+make static_ip IFACE=$PUBLIC_IFACE IP=10.10.231.1 NETMASK=255.255.255.0 GATEWAY=10.10.231.2;
+make static_dns DNS=8.8.8.8;
+make static_ip IFACE=$DMZ_IFACE IP=172.16.231.1 NETMASK=255.255.255.0;
+make static_ip IFACE=$INTERNAL_IFACE IP=192.168.231.1 NETMASK=255.255.255.0;
 cd ../;
 
 echo "===== Set static ip: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
+cd vpn/server;
+make install;
+read -n1 -r -p "Press any key to continue..." key;
+make init;
+read -n1 -r -p "Press any key to continue..." key;
+make server;
+read -n1 -r -p "Press any key to continue..." key;
+sed -re "s/INTERNET_INTERFACE=.*/INTERNET_INTERFACE=$INTERNAL_IFACE/g" -i 10.10.231.1.firewall.sh;
+cp 10.10.231.1.firewall.sh firewall.sh;
+make routing_firewall;
+read -n1 -r -p "Press any key to continue..." key;
+make add_tap BR=br0 TAP=tap0 ETH=$INTERNAL_IFACE ETH_IP=192.168.231.1 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.231.255
+read -n1 -r -p "Press any key to continue..." key;
+cp 10.10.231.1.server.conf server.conf;
+make start;
+cd ../../;
+
+echo "===== VPN: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
+
+cd proxy/server;
+make install;
+read -n1 -r -p "Press any key to continue..." key;
+cp 10.10.231.1.bad-http.acl bad-http.acl;
+make configure;
+read -n1 -r -p "Press any key to continue..." key;
+make start IFACE=br0;
+cd ../../;
+
+echo "===== Proxy: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
 
 echo 1 > /proc/sys/net/ipv4/ip_forward;
@@ -46,42 +79,22 @@ iptables -P FORWARD DROP;
 iptables -A INPUT -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT;
 
 # Allow incoming pings
-iptables -A INPUT -i $PUBLIC_IFACE   -p icmp -d 10.10.231.1   -j ACCEPT;
-iptables -A INPUT -i $DMZ_IFACE      -p icmp -d 172.16.231.1  -j ACCEPT;
-iptables -A INPUT -i $INTERNAL_IFACE -p icmp -d 192.168.231.1 -j ACCEPT;
+iptables -A INPUT -i $PUBLIC_IFACE -p icmp -d 10.10.231.1   -j ACCEPT;
+iptables -A INPUT -i $DMZ_IFACE    -p icmp -d 172.16.231.1  -j ACCEPT;
+iptables -A INPUT -i br0           -p icmp -d 192.168.231.1 -j ACCEPT;
 
 # Allow established and related packet
 iptables -A INPUT   -m state --state ESTABLISHED,RELATED -j ACCEPT;
 iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT;
 
 # Allow forward DMZ and Internal to Public
-iptables -A FORWARD -i $DMZ_IFACE      -o $PUBLIC_IFACE -j ACCEPT;
-iptables -A FORWARD -i $INTERNAL_IFACE -o $PUBLIC_IFACE -j ACCEPT;
+iptables -A FORWARD -i $DMZ_IFACE -o $PUBLIC_IFACE -j ACCEPT;
+iptables -A FORWARD -i br0        -o $PUBLIC_IFACE -j ACCEPT;
 
 # Allow forward Internal to DMZ
-iptables -A FORWARD -i $INTERNAL_IFACE -o $DMZ_IFACE    -j ACCEPT;
+iptables -A FORWARD -i br0        -o $DMZ_IFACE    -j ACCEPT;
 
 echo "===== Basic firewall: Done =====";
-read -n1 -r -p "Press any key to continue..." key;
-
-cd vpn/server;
-make install;
-read -n1 -r -p "Press any key to continue..." key;
-make init;
-read -n1 -r -p "Press any key to continue..." key;
-make server;
-read -n1 -r -p "Press any key to continue..." key;
-sed -re "s/INTERNET_INTERFACE=.*/INTERNET_INTERFACE=$INTERNAL_IFACE/g" -i 10.10.231.1.firewall.sh;
-cp 10.10.231.1.firewall.sh firewall.sh;
-make routing_firewall;
-read -n1 -r -p "Press any key to continue..." key;
-make add_tap BR=br0 TAP=tap0 ETH=$INTERNAL_IFACE ETH_IP=192.168.231.1 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.231.255
-read -n1 -r -p "Press any key to continue..." key;
-cp 10.10.231.1.server.conf server.conf;
-make start;
-cd ../../;
-
-echo "===== VPN: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
 
 # Allow services
@@ -109,7 +122,7 @@ iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dp
 # Internal network
 iptables -t nat -A PREROUTING -p tcp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -t nat -A PREROUTING -p udp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $INTERNAL_IFACE -p tcp -d 172.16.231.251 --dport 53 -j ACCEPT;
+iptables -A FORWARD -i $PUBLIC_IFACE -o br0 -p tcp -d 172.16.231.251 --dport 53 -j ACCEPT;
 
 echo "===== Allow services: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
