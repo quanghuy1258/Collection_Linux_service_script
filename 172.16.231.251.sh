@@ -16,7 +16,7 @@ fi;
 
 cd static_ip/;
 make static_ip IFACE=$IFACE IP=172.16.231.251 NETMASK=255.255.255.0 GATEWAY=172.16.231.1 DNS=192.168.231.2;
-make staic_dns DNS=192.168.231.2;
+make static_dns DNS=192.168.231.2;
 cd ../;
 
 echo "===== Set static ip: Done =====";
