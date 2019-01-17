@@ -103,20 +103,20 @@ iptables -t nat -A PREROUTING -p tcp --dport 993 -i $PUBLIC_IFACE -j DNAT --to-d
 iptables -t nat -A PREROUTING -p tcp --dport 995 -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:995;
 iptables -t nat -A PREROUTING -p tcp --dport 20  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:20;
 iptables -t nat -A PREROUTING -p tcp --dport 21  -i $PUBLIC_IFACE -j DNAT --to-destination 172.16.231.251:21;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 80  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 443 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 25  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 110 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 143 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 465 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 993 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 995 -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 20  -j ACCEPT;
-iptables -A FORWARD -i $PUBLIC_IFACE -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 21  -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 80  -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 443 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 25  -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 110 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 143 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 465 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 993 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 995 -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 20  -j ACCEPT;
+iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 21  -j ACCEPT;
 # Internal network
 iptables -t nat -A PREROUTING -p tcp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -t nat -A PREROUTING -p udp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
-iptables -A FORWARD -i $PUBLIC_IFACE -o br0 -p tcp -d 172.16.231.251 --dport 53 -j ACCEPT;
+iptables -A FORWARD -o br0 -p tcp -d 192.168.231.2 --dport 53 -j ACCEPT;
 
 echo "===== Allow services: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
