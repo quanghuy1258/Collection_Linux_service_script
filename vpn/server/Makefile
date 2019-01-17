@@ -208,63 +208,63 @@ routing_firewall:
 		fi;
 
 add_tap:
-	@	if [ $$(id -u) -ne 0 ]; then                                                                                                         \
-			echo "Error: Please run as root";                                                                                                \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(BR)" ]; then                                                                                                              \
-			echo "Error: BR arg is not set";                                                                                                 \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(TAP)" ]; then                                                                                                             \
-			echo "Error: TAP arg is not set";                                                                                                \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(ETH)" ]; then                                                                                                             \
-			echo "Error: ETH arg is not set";                                                                                                \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(ETH_IP)" ]; then                                                                                                          \
-			echo "Error: ETH_IP arg is not set";                                                                                             \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(ETH_NETMASK)" ]; then                                                                                                     \
-			echo "Error: ETH_NETMASK arg is not set";                                                                                        \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(ETH_BROADCAST)" ]; then                                                                                                   \
-			echo "Error: ETH_BROADCAST arg is not set";                                                                                      \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ ! -f "$(PATH_PWD)/bridge-start.bak" ]; then                                                                                     \
-			if [ ! "-f $(PATH_PWD)/bridge-start" ]; then                                                                                     \
-				echo "Error: File bridge-start not found";                                                                                   \
-				exit;                                                                                                                        \
-			fi;                                                                                                                              \
-			cp $(PATH_PWD)/bridge-start $(PATH_PWD)/bridge-start.bak;                                                                        \
-		fi;                                                                                                                                  \
-		cat $(PATH_PWD)/bridge-start.bak >$(PATH_PWD)/bridge-start;                                                                          \
-		echo "Check your args: BR=$(BR), TAP=$(TAP) ETH=$(ETH) ETH_IP=$(ETH_IP) ETH_NETMASK=$(ETH_NETMASK) ETH_BROADCAST=$(ETH_BROADCAST)";  \
-		echo "Warning: Example -> BR=br0 TAP="tap0 tap1" ETH=eth0 ETH_IP=192.168.8.4 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.8.255"; \
-		read -r -p "Continue? [y/N] " response;                                                                                              \
-		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then                                                                \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ "$(OS_ID)" = "ubuntu" ]; then                                                                                                   \
-			sed -re "s/br0/$(BR)/g" -i $(PATH_PWD)/bridge-start;                                                                             \
-			sed -re "s/tap0/$(TAP)/g" -i $(PATH_PWD)/bridge-start;                                                                           \
-			sed -re "s/eth0/$(ETH)/g" -i $(PATH_PWD)/bridge-start;                                                                           \
-			sed -re "s/192.168.8.4/$(ETH_IP)/g" -i $(PATH_PWD)/bridge-start;                                                                 \
-			sed -re "s/255.255.255.0/$(ETH_NETMASK)/g" -i $(PATH_PWD)/bridge-start;                                                          \
-			sed -re "s/192.168.8.255/$(ETH_BROADCAST)/g" -i $(PATH_PWD)/bridge-start;                                                        \
-			$(PATH_PWD)/bridge-start;                                                                                                        \
-			echo "===== Done =====";                                                                                                         \
-			exit;                                                                                                                            \
-		fi;                                                                                                                                  \
-		if [ -z "$(OS_ID)" ]; then                                                                                                           \
-			echo "Error: OS not supported";                                                                                                  \
-		else                                                                                                                                 \
-			echo "Error: $(OS_ID) OS not supported";                                                                                         \
+	@	if [ $$(id -u) -ne 0 ]; then                                                  \
+			echo "Error: Please run as root";                                         \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(BR)" ]; then                                                       \
+			echo "Error: BR arg is not set";                                          \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(TAP)" ]; then                                                      \
+			echo "Error: TAP arg is not set";                                         \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(ETH)" ]; then                                                      \
+			echo "Error: ETH arg is not set";                                         \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(ETH_IP)" ]; then                                                   \
+			echo "Error: ETH_IP arg is not set";                                      \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(ETH_NETMASK)" ]; then                                              \
+			echo "Error: ETH_NETMASK arg is not set";                                 \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(ETH_BROADCAST)" ]; then                                            \
+			echo "Error: ETH_BROADCAST arg is not set";                               \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ ! -f "$(PATH_PWD)/bridge-start.bak" ]; then                              \
+			if [ ! "-f $(PATH_PWD)/bridge-start" ]; then                              \
+				echo "Error: File bridge-start not found";                            \
+				exit;                                                                 \
+			fi;                                                                       \
+			cp $(PATH_PWD)/bridge-start $(PATH_PWD)/bridge-start.bak;                 \
+		fi;                                                                           \
+		cat $(PATH_PWD)/bridge-start.bak >$(PATH_PWD)/bridge-start;                   \
+		echo "Check your args: BR=$(BR), TAP=$(TAP) ETH=$(ETH) ETH_IP=$(ETH_IP) ETH_NETMASK=$(ETH_NETMASK) ETH_BROADCAST=$(ETH_BROADCAST)";    \
+		echo "Warning: Example -> BR=br0 TAP=\"tap0 tap1\" ETH=eth0 ETH_IP=192.168.8.4 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.8.255"; \
+		read -r -p "Continue? [y/N] " response;                                       \
+		if [ -z "$$(echo $$response | grep -E "^([yY][eE][sS]|y)$$")" ]; then         \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ "$(OS_ID)" = "ubuntu" ]; then                                            \
+			sed -re "s/br0/$(BR)/g" -i $(PATH_PWD)/bridge-start;                      \
+			sed -re "s/tap0/$(TAP)/g" -i $(PATH_PWD)/bridge-start;                    \
+			sed -re "s/eth0/$(ETH)/g" -i $(PATH_PWD)/bridge-start;                    \
+			sed -re "s/192.168.8.4/$(ETH_IP)/g" -i $(PATH_PWD)/bridge-start;          \
+			sed -re "s/255.255.255.0/$(ETH_NETMASK)/g" -i $(PATH_PWD)/bridge-start;   \
+			sed -re "s/192.168.8.255/$(ETH_BROADCAST)/g" -i $(PATH_PWD)/bridge-start; \
+			$(PATH_PWD)/bridge-start;                                                 \
+			echo "===== Done =====";                                                  \
+			exit;                                                                     \
+		fi;                                                                           \
+		if [ -z "$(OS_ID)" ]; then                                                    \
+			echo "Error: OS not supported";                                           \
+		else                                                                          \
+			echo "Error: $(OS_ID) OS not supported";                                  \
 		fi;
 
 start:
