@@ -33,10 +33,6 @@ make init;
 read -n1 -r -p "Press any key to continue..." key;
 make server;
 read -n1 -r -p "Press any key to continue..." key;
-sed -re "s/INTERNET_INTERFACE=.*/INTERNET_INTERFACE=$INTERNAL_IFACE/g" -i 10.10.231.1.firewall.sh;
-cp 10.10.231.1.firewall.sh firewall.sh;
-make routing_firewall;
-read -n1 -r -p "Press any key to continue..." key;
 make add_tap BR=br0 TAP=tap0 ETH=$INTERNAL_IFACE ETH_IP=192.168.231.1 ETH_NETMASK=255.255.255.0 ETH_BROADCAST=192.168.231.255
 read -n1 -r -p "Press any key to continue..." key;
 cp 10.10.231.1.server.conf server.conf;
@@ -51,8 +47,6 @@ make install;
 read -n1 -r -p "Press any key to continue..." key;
 cp 10.10.231.1.bad-http.acl bad-http.acl;
 make configure;
-read -n1 -r -p "Press any key to continue..." key;
-make start IFACE=br0;
 cd ../../;
 
 echo "===== Proxy: Done =====";
@@ -132,4 +126,17 @@ make routing IFACE=$PUBLIC_IFACE;
 cd ../;
 
 echo "===== NAT: Done =====";
+read -n1 -r -p "Press any key to continue..." key;
 
+cd vpn/server;
+sed -re "s/INTERNET_INTERFACE=.*/INTERNET_INTERFACE=$PUBLIC_IFACE/g" -i 10.10.231.1.firewall.sh;
+cp 10.10.231.1.firewall.sh firewall.sh;
+make routing_firewall;
+read -n1 -r -p "Press any key to continue..." key;
+cd ../../;
+cd proxy/server;
+make start IFACE=br0;
+read -n1 -r -p "Press any key to continue..." key;
+cd ../../;
+
+echo "===== Firewall for VPN and Proxy: Done =====";
