@@ -140,4 +140,7 @@ make start IFACE=br0;
 read -n1 -r -p "Press any key to continue..." key;
 cd ../../;
 
+iptables -A INPUT   -i $INTERNAL_IFACE -j ACCEPT;
+iptables -A FORWARD -i $INTERNAL_IFACE -j ACCEPT;
+
 echo "===== Firewall for VPN and Proxy: Done =====";
