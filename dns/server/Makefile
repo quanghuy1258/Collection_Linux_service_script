@@ -86,6 +86,9 @@ configure:
 			if [ -z "$$(cat /etc/bind/named.conf.options | grep -P "^[ \t]*allow-query { any; };" )" ]; then     \
 				sed -i "/options {/a\	allow-query { any; };" /etc/bind/named.conf.options;                     \
 			fi;                                                                                                  \
+			if [ -z "$$(cat /etc/bind/named.conf.options | grep -P "^[ \t]*recursion yes;" )" ]; then            \
+				sed -i "/options {/a\	recursion yes;" /etc/bind/named.conf.options;                            \
+			fi;                                                                                                  \
 			echo "===== Done =====";                                                                             \
 			exit;                                                                                                \
 		fi;                                                                                                      \
