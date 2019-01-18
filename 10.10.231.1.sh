@@ -117,6 +117,7 @@ iptables -A FORWARD -o $DMZ_IFACE -p tcp -d 172.16.231.251 --dport 21  -j ACCEPT
 iptables -t nat -A PREROUTING -p tcp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -t nat -A PREROUTING -p udp --dport 53  -i $PUBLIC_IFACE -j DNAT --to-destination 192.168.231.2:53;
 iptables -A FORWARD -o br0 -p tcp -d 192.168.231.2 --dport 53 -j ACCEPT;
+iptables -A FORWARD -o br0 -p udp -d 192.168.231.2 --dport 53 -j ACCEPT;
 
 echo "===== Allow services: Done =====";
 read -n1 -r -p "Press any key to continue..." key;
