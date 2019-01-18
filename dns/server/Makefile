@@ -83,6 +83,9 @@ configure:
 				cat $(PATH_PWD)/named.conf.$$VAR_ZONE >> /etc/bind/named.conf.local;                             \
 			fi;                                                                                                  \
 			cp $(PATH_PWD)/db.$$VAR_ZONE /etc/bind/;                                                             \
+			if [ -z "$$(cat /etc/bind/named.conf.options | grep -P "^[ \t]*allow-query { any; };" )" ]; then     \
+				sed -i "/options {/a\	allow-query { any; };" /etc/bind/named.conf.options;                     \
+			fi;                                                                                                  \
 			echo "===== Done =====";                                                                             \
 			exit;                                                                                                \
 		fi;                                                                                                      \
