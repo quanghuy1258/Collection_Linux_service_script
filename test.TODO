@@ -1,0 +1,9 @@
+- Outgoing 3 servers: ping google.com, ping 8.8.8.8
+- DHCP: 192.168.231.10
+- DNS: nslookup --> server 192.168.231.2 --> google.com, mail.huyhy.com
+- Web: www.huyhy.com
+- Mail: send from ...@huyhy.com to ...@huyhy.com
+- SSH: from 192.168.231.0/24 and from 172.168.231.0/24
+- NAT
+- Proxy: curl www.facebook.com, curl genk.vn
+- Firewall: curl https://www.huyhy.com from 10.10.231.0/24, telnet 10.10.231.1 25
