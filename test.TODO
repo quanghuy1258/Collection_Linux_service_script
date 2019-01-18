@@ -7,3 +7,4 @@
 - NAT
 - Proxy: curl www.facebook.com, curl genk.vn
 - Firewall: curl https://www.huyhy.com from 10.10.231.0/24, telnet 10.10.231.1 25
+- VPN
